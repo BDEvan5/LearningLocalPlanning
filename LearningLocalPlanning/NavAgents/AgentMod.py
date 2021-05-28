@@ -249,22 +249,12 @@ class ModVehicleTrain(BaseMod):
 
             self.agent.replay_buffer.add(self.nn_state, self.nn_act, nn_s_prime, reward, False)
 
-    # def calculate_reward(self, s_prime):
-    #     # reward = (self.state[6] - s_prime[6]) 
-    #     reward = (s_prime[6] - self.state[6]) 
-    #     # reward += 0.02 * (1-abs(self.nn_act[0]))
-        
-    #     return reward
-
     def calculate_reward(self, s_prime):
         # reward = (self.state[6] - s_prime[6]) 
         reward = (s_prime[6] - self.state[6]) 
         # reward = 0.02 * (1-abs(s_prime[4])) # minimise steering
         
         return reward
-
-    # def calculate_reward(self, s_prime):
-    #     return 0
 
     def done_entry(self, s_prime):
         """
@@ -276,17 +266,13 @@ class ModVehicleTrain(BaseMod):
 
         self.t_his.add_step_data(reward)
         self.t_his.lap_done(False)
-        # self.t_his.lap_done(True)
         if self.t_his.ptr % 10 == 0:
             self.t_his.print_update(True)
             self.agent.save(self.path)
         self.state = None
-        # self.history.save_nn_output()
-
-        # mem_entry = (self.nn_state, self.nn_act, nn_s_prime, reward, True)
-        # self.agent.replay_buffer.add(mem_entry)
 
         self.agent.replay_buffer.add(self.nn_state, self.nn_act, nn_s_prime, reward, True)
+
 
 class ModVehicleTest(BaseMod):
     def __init__(self, agent_name, map_name, sim_conf):

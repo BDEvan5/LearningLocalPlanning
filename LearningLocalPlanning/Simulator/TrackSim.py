@@ -1,12 +1,42 @@
-from io import FileIO
+
+
+from matplotlib import pyplot as plt 
+import yaml, csv, os  
 import numpy as np 
+from numba import njit
 from scipy import ndimage
-from matplotlib import pyplot as plt
-import yaml
-import csv
+from argparse import Namespace
+
+
+from LearningLocalPlanning.Simulator.BaseSimClasses import BaseSim
 from PIL import Image
 
-import LearningLocalPlanning.LibFunctions as lib
+
+
+
+
+def add_locations(x1=[0, 0], x2=[0, 0], dx=1):
+    # dx is a scaling factor
+    ret = [0.0, 0.0]
+    for i in range(2):
+        ret[i] = x1[i] + x2[i] * dx
+    return np.array(ret)
+
+
+def get_distance(x1=[0, 0], x2=[0, 0]):
+    d = [0.0, 0.0]
+    for i in range(2):
+        d[i] = x1[i] - x2[i]
+    return np.linalg.norm(d)
+     
+def sub_locations(x1=[0, 0], x2=[0, 0], dx=1):
+    # dx is a scaling factor
+    ret = [0.0, 0.0]
+    for i in range(2):
+        ret[i] = x1[i] - x2[i] * dx
+    return ret
+
+
 
 class TrackMap:
     def __init__(self, map_name) -> None:
@@ -59,7 +89,7 @@ class TrackMap:
             self.start_pose = np.array(yaml_file['start_pose'])
         except Exception as e:
             print(f"Problem loading, check key: {e}")
-            raise FileIO("Problem loading map yaml file")
+            raise FileNotFoundError("Problem loading map yaml file")
 
         self.end_goal = self.start_pose[0:2]
 
@@ -100,8 +130,8 @@ class TrackMap:
             # start with using just int_idx
             n = self.nvecs[i]
             offset = np.array([n[0]*w, n[1]*w])
-            location = lib.add_locations(self.t_pts[int_idx], offset)
-            if lib.get_distance(location, self.start_pose[0:2]) < 1:
+            location = add_locations(self.t_pts[int_idx], offset)
+            if get_distance(location, self.start_pose[0:2]) < 1:
                 continue
             # location = np.flip(location)
             # location = self.t_pts[int_idx]
@@ -231,9 +261,9 @@ class TrackMap:
         o_line = self.wpts
         new_line = []
         for i in range(len(self.wpts)-1):
-            dd = lib.sub_locations(o_line[i+1], o_line[i])
+            dd = sub_locations(o_line[i+1], o_line[i])
             for j in range(n):
-                pt = lib.add_locations(o_line[i], dd, dz*j)
+                pt = add_locations(o_line[i], dd, dz*j)
                 new_line.append(pt)
 
         self.wpts = np.array(new_line)
@@ -247,198 +277,72 @@ class TrackMap:
         plt.pause(0.0001)
 
 
+def load_conf(path, fname):
+    full_path = path + '/config/' + fname + '.yaml'
+    with open(full_path) as file:
+        conf_dict = yaml.load(file, Loader=yaml.FullLoader)
 
-class ForestMap:
-    def __init__(self, map_name) -> None:
-        self.map_name = map_name 
+    conf = Namespace(**conf_dict)
 
-        # map info
-        self.resolution = None
-        self.n_obs = None 
-        self.map_height = None
-        self.map_width = None
-        self.forest_length = None
-        self.forest_width = None
-        self.start_pose = None
-        self.obs_size = None
-        self.obstacle_buffer = None
-        self.end_y = None
-        self.end_goal = None
+    return conf
 
-        self.origin = [0, 0, 0] # for ScanSimulator
+
+
+
+
+class TrackSim(BaseSim):
+    """
+    Simulator for Race Tracks, inherits from the base sim and adds a layer for use with a race track for f110
+
+    Important to note the check_done function which checks if the episode is complete
         
-        self.dt_img = None
-        self.map_img = None
+    """
+    def __init__(self, map_name, sim_conf=None):
+        """
+        Init function
 
-        self.ref_pts = None # std wpts that aren't expanded
-        self.ss_normal = None # not expanded
-        self.diffs = None
-        self.l2s = None
+        Args:
+            map_name: name of map to use.
+            sim_conf: config file for simulation
 
-        self.load_map()
-        self.load_center_pts()
+        """
+        if sim_conf is None:
+            path = os.path.dirname(__file__)
+            sim_conf = load_conf(path, "std_config")
 
-    def load_map(self):
-        file_name = 'maps/' + self.map_name + '.yaml'
-        with open(file_name) as file:
-            documents = yaml.full_load(file)
-            yaml_file = dict(documents.items())
+        env_map = TrackMap(map_name)
+        BaseSim.__init__(self, env_map, self.check_done_reward_track_train, sim_conf)
+        self.end_distance = sim_conf.end_distance
 
-        try:
-            self.resolution = yaml_file['resolution']
-            self.n_obs = yaml_file['n_obs']
-            self.obs_size = yaml_file['obs_size']
-            self.start_pose = np.array(yaml_file['start_pose'])
-            self.forest_length = yaml_file['forest_length']
-            self.forest_width = yaml_file['forest_width']
-            self.obstacle_buffer = yaml_file['obstacle_buffer']
-            self.end_y = yaml_file['end_y']
-        except Exception as e:
-            print(e)
-            raise FileIO("Problem loading map yaml file")
+    def check_done_reward_track_train(self):
+        """
+        Checks if the race lap is complete
 
-        self.end_goal = np.array([self.start_pose[0], self.end_y])
+        Returns
+            Done flag
+        """
+        self.reward = 0 # normal
+        if self.env_map.check_scan_location([self.car.x, self.car.y]):
+            self.done = True
+            self.colission = True
+            self.reward = -1
+            self.done_reason = f"Crash obstacle: [{self.car.x:.2f}, {self.car.y:.2f}]"
+        # horizontal_force = self.car.mass * self.car.th_dot * self.car.velocity
+        # self.y_forces.append(horizontal_force)
+        # if horizontal_force > self.car.max_friction_force:
+            # self.done = True
+            # self.reward = -1
+            # self.done_reason = f"Friction limit reached: {horizontal_force} > {self.car.max_friction_force}"
+        if self.steps > self.max_steps:
+            self.done = True
+            self.done_reason = f"Max steps"
 
-        self.map_height = int(self.forest_length / self.resolution)
-        self.map_width = int(self.forest_width / self.resolution)
-        self.map_img = np.zeros((self.map_width, self.map_height))
-
-        self.set_dt()
-
-    def add_obstacles(self):
-        self.map_img = np.zeros((self.map_width, self.map_height))
-
-        y_length = (self.end_y - self.obstacle_buffer*2 - self.start_pose[1] - self.obs_size)
-        box_factor = 1.4
-        y_box = y_length / (self.n_obs * box_factor)
-        rands = np.random.random((self.n_obs, 2))
-        xs = rands[:, 0] * (self.forest_width-self.obs_size) 
-        ys = rands[:, 1] * y_box
-        y_start = self.start_pose[1] + self.obstacle_buffer
-        y_pts = [y_start + y_box * box_factor * i for i in range(self.n_obs)]
-        ys = ys + y_pts
-
-        obs_locations = np.concatenate([xs[:, None], ys[:, None]], axis=-1)
-        obs_size_px = int(self.obs_size/self.resolution)
-        for location in obs_locations:
-            x, y = self.xy_to_row_column(location)
-            # print(f"Obstacle: ({location}): {x}, {y}")
-            self.map_img[x:x+obs_size_px, y:y+obs_size_px] = 1
-        
-    def set_dt(self):
-        img = np.ones_like(self.map_img) - self.map_img
-        img[0, :] = 0 #TODO: move this to the original map img that I make
-        img[-1, :] = 0
-        img[:, 0] = 0
-        img[:, -1] = 0
-
-        self.dt_img = ndimage.distance_transform_edt(img) * self.resolution
-        self.dt_img = np.array(self.dt_img).T
-
-        return self.dt_img
-
-    def render_map(self, figure_n=1, wait=False):
-        #TODO: draw the track boundaries nicely
-        f = plt.figure(figure_n)
-        plt.clf()
-
-        plt.xlim([0, self.map_width])
-        plt.ylim([0, self.map_height])
-
-        plt.imshow(self.map_img.T, origin='lower')
-
-        xs = np.linspace(0, self.map_width, 10)
-        ys = np.ones_like(xs) * self.end_y / self.resolution
-        plt.plot(xs, ys, '--')     
-        x, y = self.xy_to_row_column(self.start_pose[0:2])
-        plt.plot(x, y, '*', markersize=14)
-
-        plt.pause(0.0001)
-        if wait:
-            plt.show()
-            pass
-
-    def xy_to_row_column(self, pt):
-        c = int(round(np.clip(pt[0] / self.resolution, 0, self.map_width-2)))
-        r = int(round(np.clip(pt[1] / self.resolution, 0, self.map_height-2)))
-        return c, r
-
-    def check_scan_location(self, x_in):
-        if x_in[0] < 0 or x_in[1] < 0:
-            return True
-        if x_in[0] > self.forest_width or x_in[1] > self.forest_length:
-            return True
-        x, y = self.xy_to_row_column(x_in)
-        if self.map_img[x, y]:
-            return True
-
-    def check_plan_location(self, x_in):
-        if x_in[0] < 0 or x_in[1] < 0:
-            return True
-        if x_in[0] > self.forest_width or x_in[1] > self.forest_length:
-            return True
-        x, y = self.xy_to_row_column(x_in)
-        #TODO: figure out the x, y relationship
-        # if self.dt_img[x, y] < 0.2:
-        if self.dt_img[y, x] < 0.2:
-            return True
-
-    def convert_positions(self, pts):
-        xs, ys = [], []
-        for pt in pts:
-            x, y = self.xy_to_row_column(pt)
-            xs.append(x)
-            ys.append(y)
-
-        return np.array(xs), np.array(ys)
-
-    def render_wpts(self, wpts):
-        plt.figure(4)
-        xs, ys = self.convert_positions(wpts)
-        plt.plot(xs, ys, '--', linewidth=2)
-        # plt.plot(xs, ys, '+', markersize=12)
-
-        plt.pause(0.0001)
-
-    def render_aim_pts(self, pts):
-        plt.figure(4)
-        xs, ys = self.convert_positions(pts)
-        # plt.plot(xs, ys, '--', linewidth=2)
-        plt.plot(xs, ys, 'x', markersize=10)
-
-        plt.pause(0.0001)
-
-    def load_center_pts(self):
-
-        track = []
-        filename = 'maps/' + self.map_name + "_opti.csv"
-        with open(filename, 'r') as csvfile:
-            csvFile = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)  
-        
-            for lines in csvFile:  
-                track.append(lines)
-
-        track = np.array(track)
-        print(f"Track Loaded: {filename}")
-
-        self.ref_pts = track[:, 1:3]
-        self.ss_normal = track[:, 0]
-        # self.expand_wpts()
-        # print(self.ref_pts)
-        self.diffs = self.ref_pts[1:,:] - self.ref_pts[:-1,:]
-        self.l2s   = self.diffs[:,0]**2 + self.diffs[:,1]**2
+        car = [self.car.x, self.car.y]
+        cur_end_dis = get_distance(car, self.env_map.start_pose[0:2]) 
+        if cur_end_dis < self.end_distance and self.steps > 800:
+            self.done = True
+            self.reward = 1
+            self.done_reason = f"Lap complete, d: {cur_end_dis}"
 
 
-
-    def expand_wpts(self):
-        n = 5 # number of pts per orig pt
-        dz = 1 / n
-        o_line = self.wpts
-        new_line = []
-        for i in range(len(self.wpts)-1):
-            dd = lib.sub_locations(o_line[i+1], o_line[i])
-            for j in range(n):
-                pt = lib.add_locations(o_line[i], dd, dz*j)
-                new_line.append(pt)
-
-        self.wpts = np.array(new_line)
+        return self.done

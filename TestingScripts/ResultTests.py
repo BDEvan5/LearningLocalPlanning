@@ -8,7 +8,8 @@ from LearningLocalPlanning.NavAgents.FollowTheGap import ForestFGM
 from toy_f110 import ForestSim
 
 import numpy as np 
-import csv
+import csv, yaml 
+from argparse import Namespace
 
 
 map_name = "forest2"
@@ -19,6 +20,16 @@ repeat_name = f"RepeatTest_{n}"
 eval_name = f"CompareTest_{n}"
 
 n_test = 5
+
+
+def load_conf(path, fname):
+    full_path = path + 'config/' + fname + '.yaml'
+    with open(full_path) as file:
+        conf_dict = yaml.load(file, Loader=yaml.FullLoader)
+
+    conf = Namespace(**conf_dict)
+
+    return conf
 
 
 
@@ -172,19 +183,20 @@ class TestVehicles(TestData):
 
 
 def big_test():
-    env = ForestSim(map_name)
-    test = TestVehicles(env.sim_conf, eval_name)
+    sim_conf = load_conf("", "std_config")
+    env = ForestSim(map_name, sim_conf)
+    test = TestVehicles(sim_conf, eval_name)
 
-    vehicle = NavTestVehicle(nav_name, env.sim_conf)
+    vehicle = NavTestVehicle(nav_name, sim_conf)
     test.add_vehicle(vehicle)
 
     vehicle = ForestFGM()
     test.add_vehicle(vehicle)
 
-    vehicle = Oracle(env.sim_conf)
+    vehicle = Oracle(sim_conf)
     test.add_vehicle(vehicle)
 
-    vehicle = ModVehicleTest(mod_name, map_name, env.sim_conf)
+    vehicle = ModVehicleTest(mod_name, map_name, sim_conf)
     test.add_vehicle(vehicle)
 
     # test.run_eval(env, 1, True)
@@ -193,12 +205,13 @@ def big_test():
 
 
 def test_repeat():
-    env = ForestSim(map_name)
-    test = TestVehicles(env.sim_conf, repeat_name)
+    sim_conf = load_conf("", "std_config")
+    env = ForestSim(map_name, sim_conf)
+    test = TestVehicles(sim_conf, repeat_name)
 
     for i in range(10):
         train_name = f"ModRepeat_forest_{i}"
-        vehicle = ModVehicleTest(train_name, map_name, env.sim_conf)
+        vehicle = ModVehicleTest(train_name, map_name, sim_conf)
         test.add_vehicle(vehicle)
 
     # test.run_eval(env, 1000, False)
