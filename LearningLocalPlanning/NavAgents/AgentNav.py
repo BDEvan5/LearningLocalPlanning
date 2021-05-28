@@ -16,12 +16,13 @@ class BaseNav:
         self.max_steer = sim_conf.max_steer
 
         self.distance_scale = 20 # max meters for scaling
+        self.range_finder_scale = 5
 
     def transform_obs(self, obs):
         max_angle = 3.14
 
         state = obs['state']
-        scan = obs['scan']
+        scan = obs['scan'] / self.range_finder_scale
         target = obs['target']
 
         cur_v = [state[3]/self.max_v]

@@ -301,7 +301,7 @@ class ModVehicleTest(BaseMod):
         # self.vis = LidarVizMod(10)
 
     def plan_act(self, obs):
-        pp_action = super().act_pp(obs)
+        pp_action = super().act_pp(obs['state'])
         nn_obs = self.transform_obs(obs, pp_action)
 
         nn_action = self.agent.act(nn_obs, noise=0)

@@ -12,7 +12,7 @@ from argparse import Namespace
 
 
 map_name = "forest2"
-n = 1
+n = 3
 nav_name = f"Navforest_{n}"
 mod_name = f"ModForest_{n}"
 repeat_name = f"RepeatTest_{n}"
@@ -110,8 +110,8 @@ def test_mod():
 if __name__ == "__main__":
     # test_follow_the_gap()
     # test_oracle()
-    test_mod()
-    # test_nav()
+    # test_mod()
+    test_nav()
 
 
 
