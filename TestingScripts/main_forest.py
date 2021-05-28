@@ -11,8 +11,9 @@ from TestingScripts.TrainTest import *
 from toy_f110 import ForestSim
 
 map_name = "forest2"
-nav_name = "Navforest_1"
-mod_name = "ModForest_1"
+n = 2 
+nav_name = f"Navforest_{n}"
+mod_name = f"ModForest_{n}"
 # mod_name = "ModForest_nr6"
 # nav_name = "Navforest_nr5"
 repeat_name = "RepeatTest_1"
@@ -92,8 +93,8 @@ def big_test():
     env = ForestSim(map_name)
     test = TestVehicles(env.sim_conf, eval_name)
 
-    # vehicle = NavTestVehicle(nav_name, env.sim_conf)
-    # test.add_vehicle(vehicle)
+    vehicle = NavTestVehicle(nav_name, env.sim_conf)
+    test.add_vehicle(vehicle)
 
     vehicle = ForestFGM()
     test.add_vehicle(vehicle)
@@ -125,11 +126,11 @@ def test_repeat():
 
 if __name__ == "__main__":
     
-    train_mod()
-    train_nav()
+    # train_nav()
+    # train_mod()
     # train_repeatability()
 
-    # test_nav()
+    test_nav()
     # test_follow_the_gap()
     # test_oracle()
     # test_mod()

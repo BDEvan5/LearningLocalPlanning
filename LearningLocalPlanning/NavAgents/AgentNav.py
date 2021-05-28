@@ -85,7 +85,7 @@ class NavTrainVehicle(BaseNav):
     def done_entry(self, s_prime):
         reward = self.calcualte_reward(s_prime)
         nn_s_prime = self.transform_obs(s_prime)
-        if len(self.t_his.rewards) % 10 == 0 or True:
+        if self.t_his.ptr % 10 == 0 or True:
             self.t_his.print_update()
             self.agent.save(self.path)
         self.state = None
