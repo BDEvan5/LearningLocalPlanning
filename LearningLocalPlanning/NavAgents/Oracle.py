@@ -15,11 +15,7 @@ class OraclePP:
         self.name = "Oracle Path Follower"
         self.path_name = None
 
-        # mu = sim_conf.mu
-        # g = sim_conf.g
-        # self.m = sim_conf.m
         self.wheelbase = sim_conf.l_f + sim_conf.l_r
-        # self.f_max = mu * self.m * g #* safety_f
 
         self.v_gain = 0.5
         self.lookahead = 0.8
@@ -63,7 +59,6 @@ class OraclePP:
 
         speed, steering_angle = pure_pursuit_utils.get_actuation(pose_th, lookahead_point, pos, self.lookahead, self.wheelbase)
 
-        # speed = 4
         speed = calculate_speed(steering_angle)
 
         return [steering_angle, speed]
@@ -102,10 +97,8 @@ class Oracle(OraclePP):
         n = 5 # number of pts per orig pt
         dz = 1 / n
         o_line = self.waypoints[:, 0:2]
-        # o_ss = self.ss
         o_vs = self.waypoints[:, 2]
         new_line = []
-        # new_ss = []
         new_vs = []
         for i in range(len(self.waypoints)-1):
             dd = lib.sub_locations(o_line[i+1], o_line[i])
@@ -113,14 +106,10 @@ class Oracle(OraclePP):
                 pt = lib.add_locations(o_line[i], dd, dz*j)
                 new_line.append(pt)
 
-                # ds = o_ss[i+1] - o_ss[i]
-                # new_ss.append(o_ss[i] + dz*j*ds)
-
                 dv = o_vs[i+1] - o_vs[i]
                 new_vs.append(o_vs[i] + dv * j * dz)
 
         wpts = np.array(new_line)
-        # self.ss = np.array(new_ss)
         vs = np.array(new_vs)
         self.waypoints = np.concatenate([wpts, vs[:, None]], axis=-1)
 

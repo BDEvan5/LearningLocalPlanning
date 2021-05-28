@@ -1,11 +1,8 @@
 from os import name
 import numpy as np 
-import csv
-from matplotlib import pyplot as plt
 from numba import njit
 
 from LearningLocalPlanning.NavUtils.TD3 import TD3
-import LearningLocalPlanning.LibFunctions as lib
 from LearningLocalPlanning.NavUtils.HistoryStructs import TrainHistory
 from LearningLocalPlanning.NavUtils.speed_utils import calculate_speed
 
@@ -89,8 +86,6 @@ class NavTrainVehicle(BaseNav):
             self.t_his.print_update()
             self.agent.save(self.path)
         self.state = None
-        # mem_entry = (self.nn_state, self.nn_action, nn_s_prime, reward, True)
-        # self.agent.replay_buffer.add(mem_entry)
         self.agent.replay_buffer.add(self.nn_state, self.nn_action, nn_s_prime, reward, False)
 
         self.t_his.add_step_data(reward)
@@ -119,7 +114,6 @@ class NavTestVehicle(BaseNav):
         steering_angle = self.max_steer * nn_action[0]
 
         speed = calculate_speed(steering_angle)
-        # speed = 4
         action = np.array([steering_angle, speed])
 
         return action
