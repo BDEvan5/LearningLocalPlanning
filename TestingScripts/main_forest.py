@@ -11,8 +11,9 @@ from TestingScripts.TrainTest import *
 from toy_f110 import ForestSim
 
 map_name = "forest2"
-nav_name = "Navforest_1"
-mod_name = "ModForest_1"
+n = 2 
+nav_name = f"Navforest_{n}"
+mod_name = f"ModForest_{n}"
 # mod_name = "ModForest_nr6"
 # nav_name = "Navforest_nr5"
 repeat_name = "RepeatTest_1"
@@ -125,8 +126,8 @@ def test_repeat():
 
 if __name__ == "__main__":
     
-    train_mod()
     train_nav()
+    # train_mod()
     # train_repeatability()
 
     # test_nav()
