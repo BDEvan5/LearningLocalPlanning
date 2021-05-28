@@ -47,8 +47,9 @@ class OraclePP:
             return None
 
     def act_pp(self, obs):
-        pose_th = obs[2]
-        pos = np.array(obs[0:2], dtype=np.float)
+        state = obs['state']
+        pose_th = state[2]
+        pos = np.array(state[0:2], dtype=np.float)
 
         lookahead_point = self._get_current_waypoint(pos)
 

@@ -122,13 +122,14 @@ class BaseMod(ModPP):
         Returns:
             nn_obs: observation vector for neural network
         """
-        cur_v = [obs[3]/self.max_v]
-        cur_d = [obs[4]/self.max_steer]
-        # vr_scale = [(pp_action[1])/self.max_v] # this is probably irrelevant?
-        target_angle = [obs[5]/self.max_steer]
-        dr_scale = [pp_action[0]/self.max_steer]
+        state = obs['state']
+        scan = obs['scan']/ self.range_finder_scale
+        target = obs['target']
 
-        scan = obs[7:-1] / self.range_finder_scale
+        cur_v = [state[3]/self.max_v]
+        cur_d = [state[4]/self.max_steer]
+        target_angle = [target[0]/self.max_steer]
+        dr_scale = [pp_action[0]/self.max_steer]
 
         nn_obs = np.concatenate([cur_v, cur_d, target_angle, dr_scale, scan])
 
@@ -219,7 +220,7 @@ class ModVehicleTrain(BaseMod):
         self.reward_fcn = r_fcn
 
     def plan_act(self, obs):
-        pp_action = super().act_pp(obs)
+        pp_action = super().act_pp(obs['state'])
         nn_obs = self.transform_obs(obs, pp_action)
         self.add_memory_entry(obs, nn_obs)
 
@@ -251,18 +252,20 @@ class ModVehicleTrain(BaseMod):
 
     def calculate_reward(self, s_prime):
         # reward = (self.state[6] - s_prime[6]) 
-        reward = (s_prime[6] - self.state[6]) 
+        # reward = (s_prime[6] - self.state[6]) 
         # reward = 0.02 * (1-abs(s_prime[4])) # minimise steering
         
+        reward = s_prime['target'][1] - self.state['target'][1]
+
         return reward
 
     def done_entry(self, s_prime):
         """
         To be called when ep is done.
         """
-        pp_action = super().act_pp(s_prime)
+        pp_action = super().act_pp(s_prime['state'])
         nn_s_prime = self.transform_obs(s_prime, pp_action)
-        reward = s_prime[-1] + self.calculate_reward(s_prime)
+        reward = s_prime['reward'] + self.calculate_reward(s_prime)
 
         self.t_his.add_step_data(reward)
         self.t_his.lap_done(False)
@@ -298,7 +301,7 @@ class ModVehicleTest(BaseMod):
         # self.vis = LidarVizMod(10)
 
     def plan_act(self, obs):
-        pp_action = super().act_pp(obs)
+        pp_action = super().act_pp(obs['state'])
         nn_obs = self.transform_obs(obs, pp_action)
 
         nn_action = self.agent.act(nn_obs, noise=0)

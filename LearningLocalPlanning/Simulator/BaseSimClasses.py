@@ -230,7 +230,6 @@ class BaseSim:
         self.car = CarModel(self.sim_conf)
         self.scan_sim = ScanSimulator(self.sim_conf.n_beams)
         self.scan_sim.init_sim_map(env_map)
-        # self.scan_sim.set_check_fcn(self.env_map.check_scan_location)
 
         self.done = False
         self.colission = False
@@ -473,7 +472,13 @@ class BaseSim:
         scan = self.scan_sim.scan(pose)
         target = self.get_target_obs()
 
-        observation = np.concatenate([car_obs, target, scan, [self.reward]])
+        observation = {}
+        observation['state'] = car_obs
+        observation['scan'] = scan 
+        observation['target'] = target
+        observation['reward'] = self.reward
+
+        # observation = np.concatenate([car_obs, target, scan, [self.reward]])
         return observation
 
 @njit(cache=True)

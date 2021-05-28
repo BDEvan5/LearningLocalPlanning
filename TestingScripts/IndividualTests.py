@@ -108,10 +108,10 @@ def test_mod():
 
 
 if __name__ == "__main__":
-    test_mod()
+    # test_follow_the_gap()
+    # test_oracle()
+    # test_mod()
     test_nav()
-    test_follow_the_gap()
-    test_oracle()
 
 
 
