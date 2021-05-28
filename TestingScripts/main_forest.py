@@ -93,8 +93,8 @@ def big_test():
     env = ForestSim(map_name)
     test = TestVehicles(env.sim_conf, eval_name)
 
-    # vehicle = NavTestVehicle(nav_name, env.sim_conf)
-    # test.add_vehicle(vehicle)
+    vehicle = NavTestVehicle(nav_name, env.sim_conf)
+    test.add_vehicle(vehicle)
 
     vehicle = ForestFGM()
     test.add_vehicle(vehicle)
@@ -126,11 +126,11 @@ def test_repeat():
 
 if __name__ == "__main__":
     
-    train_nav()
+    # train_nav()
     # train_mod()
     # train_repeatability()
 
-    # test_nav()
+    test_nav()
     # test_follow_the_gap()
     # test_oracle()
     # test_mod()
