@@ -3,7 +3,7 @@
 from LearningLocalPlanning.NavAgents.AgentNav import NavTrainVehicle
 from LearningLocalPlanning.NavAgents.AgentMod import ModVehicleTrain
 
-from toy_f110 import ForestSim
+from LearningLocalPlanning.Simulator.ForestSim import ForestSim
 import yaml   
 from argparse import Namespace
 
@@ -45,7 +45,7 @@ nav_name = f"Navforest_{n}"
 mod_name = f"ModForest_{n}"
 repeat_name = f"RepeatTest_{n}"
 eval_name = f"CompareTest_{n}"
-train_n = 100
+train_n = 1000
 
 def load_conf(path, fname):
     full_path = path + 'config/' + fname + '.yaml'

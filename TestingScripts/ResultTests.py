@@ -5,7 +5,7 @@ from LearningLocalPlanning.NavAgents.AgentMod import ModVehicleTest
 from LearningLocalPlanning.NavAgents.Oracle import Oracle
 from LearningLocalPlanning.NavAgents.FollowTheGap import ForestFGM
 
-from toy_f110 import ForestSim
+from LearningLocalPlanning.Simulator.ForestSim import ForestSim
 
 import numpy as np 
 import csv, yaml 
@@ -13,7 +13,7 @@ from argparse import Namespace
 
 
 map_name = "forest2"
-n = 2
+n = 1
 nav_name = f"Navforest_{n}"
 mod_name = f"ModForest_{n}"
 repeat_name = f"RepeatTest_{n}"
@@ -222,7 +222,7 @@ def test_repeat():
 if __name__ == "__main__":
     
 
+    big_test()
     test_repeat()
 
-    big_test()
 

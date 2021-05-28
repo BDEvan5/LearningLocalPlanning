@@ -20,12 +20,14 @@ class BaseNav:
     def transform_obs(self, obs):
         max_angle = 3.14
 
-        cur_v = [obs[3]/self.max_v]
-        cur_d = [obs[4]/self.max_steer]
-        target_angle = [obs[5]/max_angle]
-        # target_distance = [obs[6]/self.distance_scale]
+        state = obs['state']
+        scan = obs['scan']
+        target = obs['target']
 
-        scan = obs[7:-1]
+        cur_v = [state[3]/self.max_v]
+        cur_d = [state[4]/self.max_steer]
+        target_angle = [target[0]/max_angle]
+        # target_distance = [target[1]/self.distance_scale]
 
         nn_obs = np.concatenate([cur_v, cur_d, target_angle, scan])
 
@@ -65,8 +67,9 @@ class NavTrainVehicle(BaseNav):
         return self.action
 
     def calcualte_reward(self, s_prime):
-        reward = (s_prime[6] - self.state[6]) 
-        reward += s_prime[-1]
+        reward = s_prime['target'][1] - self.state['target'][1]
+        # reward = (s_prime[6] - self.state[6]) 
+        reward += s_prime['reward']
         
         return reward
 
