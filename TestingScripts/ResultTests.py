@@ -8,7 +8,7 @@ from LearningLocalPlanning.NavAgents.FollowTheGap import ForestFGM
 from toy_f110 import ForestSim
 
 import numpy as np 
-
+import csv
 
 
 map_name = "forest2"
@@ -18,7 +18,7 @@ mod_name = f"ModForest_{n}"
 repeat_name = f"RepeatTest_{n}"
 eval_name = f"CompareTest_{n}"
 
-
+n_test = 5
 
 
 
@@ -95,19 +95,6 @@ class TestData:
             csvwriter = csv.writer(csvfile)
             csvwriter.writerows(data)
 
-    # def load_csv_data(self, eval_name):
-    #     file_name = 'Vehicles/Evals' + eval_name + '.csv'
-
-    #     with open(file_name, 'r') as csvfile:
-    #         csvFile = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)  
-            
-    #         for lines in csvFile:  
-    #             self.
-    #             rewards.append(lines)
-
-
-    # def plot_eval(self):
-    #     pass
 
 
 class TestVehicles(TestData):
@@ -201,7 +188,7 @@ def big_test():
     test.add_vehicle(vehicle)
 
     # test.run_eval(env, 1, True)
-    test.run_eval(env, 100, False, wait=False)
+    test.run_eval(env, n_test, False, wait=False)
 
 
 
@@ -215,7 +202,7 @@ def test_repeat():
         test.add_vehicle(vehicle)
 
     # test.run_eval(env, 1000, False)
-    test.run_eval(env, 100, False)
+    test.run_eval(env, n_test, False)
 
 
 
