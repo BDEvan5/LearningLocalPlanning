@@ -6,6 +6,7 @@ from numba import njit
 import LearningLocalPlanning.LibFunctions as lib
 from LearningLocalPlanning.Simulator.LaserScanner import ScanSimulator
 
+
 class CarModel:
     """
     A simple class which holds the state of a car and can update the dynamics based on the bicycle model
@@ -227,7 +228,7 @@ class BaseSim:
         self.max_steps = self.sim_conf.max_steps
         self.plan_steps = self.sim_conf.plan_steps
 
-        self.car = CarModel(self.sim_conf)
+        self.state = np.zeros(5)
         self.scan_sim = ScanSimulator(self.sim_conf.n_beams)
         self.scan_sim.init_sim_map(env_map)
 
@@ -241,20 +242,14 @@ class BaseSim:
         self.history = SimHistory(self.sim_conf)
         self.done_reason = ""
 
-    def step_control(self, action):
-        """
-        Steps the simulator for a single step
+        self.wheelbase = sim_conf.l_f + sim_conf.l_r
+        self.mass = sim_conf.m
+        self.mu = sim_conf.mu
 
-        Args:
-            action: [steer, speed]
-        """
-        d_ref = np.clip(action[0], -self.car.max_steer, self.car.max_steer)
-        v_ref = np.clip(action[1], 0, self.car.max_v)
-        acceleration, steer_dot = self.control_system(v_ref, d_ref)
-        self.car.update_kinematic_state(acceleration, steer_dot, self.timestep)
-        self.steps += 1
-
-        return self.done_fcn()
+        self.max_d_dot = sim_conf.max_d_dot
+        self.max_steer = sim_conf.max_steer
+        self.max_a = sim_conf.max_a
+        self.max_v = sim_conf.max_v
 
     def step_plan(self, action):
         """
@@ -264,9 +259,14 @@ class BaseSim:
             action: [steering, speed]
             done_fcn: a no arg function which checks if the simulation is complete
         """
-
+        action = np.array(action)
+        self.action = action
         for _ in range(self.plan_steps):
-            if self.step_control(action):
+            u = control_system(self.state, action, self.max_v, self.max_steer, 8, 3.2)
+            self.state = update_kinematic_state(self.state, u, self.timestep, self.wheelbase, self.max_steer, self.max_v)
+            self.steps += 1 
+
+            if self.done_fcn():
                 break
 
         self.record_history(action)
@@ -279,35 +279,10 @@ class BaseSim:
 
     def record_history(self, action):
         self.action = action
-        self.history.velocities.append(self.car.velocity)
-        self.history.steering.append(self.car.steering)
-        self.history.positions.append([self.car.x, self.car.y])
-        self.history.thetas.append(self.car.theta)
-
-    def control_system(self, v_ref, d_ref):
-        """
-        Generates acceleration and steering velocity commands to follow a reference
-        Note: the controller gains are hand tuned in the fcn
-
-        Args:
-            v_ref: the reference velocity to be followed
-            d_ref: reference steering to be followed
-
-        Returns:
-            a: acceleration
-            d_dot: the change in delta = steering velocity
-        """
-
-        kp_a = 10
-        a = (v_ref - self.car.velocity) * kp_a
-        
-        kp_delta = 40
-        d_dot = (d_ref - self.car.steering) * kp_delta
-
-        a = np.clip(a, -8, 8)
-        d_dot = np.clip(d_dot, -3.2, 3.2)
-
-        return a, d_dot
+        self.history.velocities.append(self.state[3])
+        self.history.steering.append(self.state[4])
+        self.history.positions.append(self.state[0:2])
+        self.history.thetas.append(self.state[2])
 
     def reset(self, add_obs=True):
         """
@@ -325,9 +300,8 @@ class BaseSim:
         self.steps = 0
         self.reward = 0
 
-        #TODO: move this reset to inside car
-        self.car.reset_state(self.env_map.start_pose)
-
+        self.state[0:3] = self.env_map.start_pose 
+        self.state[3:5] = np.zeros(2)
 
         self.history.reset_history()
 
@@ -356,7 +330,7 @@ class BaseSim:
         plt.plot(xs, ys, 'r', linewidth=3)
         plt.plot(xs, ys, '+', markersize=12)
 
-        x, y = self.env_map.xy_to_row_column([self.car.x, self.car.y])
+        x, y = self.env_map.xy_to_row_column(self.state[0:2])
         plt.plot(x, y, 'x', markersize=20)
 
         text_x = self.env_map.map_width + 1
@@ -368,13 +342,13 @@ class BaseSim:
         plt.text(text_x, text_y * 2, s) 
         s = f"Done: {self.done}"
         plt.text(text_x, text_y * 3, s) 
-        s = f"Pos: [{self.car.x:.2f}, {self.car.y:.2f}]"
+        s = f"Pos: [{self.state[0]:.2f}, {self.state[1]:.2f}]"
         plt.text(text_x, text_y * 4, s)
-        s = f"Vel: [{self.car.velocity:.2f}]"
+        s = f"Vel: [{self.state[3]:.2f}]"
         plt.text(text_x, text_y * 5, s)
-        s = f"Theta: [{(self.car.theta * 180 / np.pi):.2f}]"
+        s = f"Theta: [{(self.state[2] * 180 / np.pi):.2f}]"
         plt.text(text_x, text_y * 6, s) 
-        s = f"Delta x100: [{(self.car.steering*100):.2f}]"
+        s = f"Delta x100: [{(self.state[4]*100):.2f}]"
         plt.text(text_x, text_y * 7, s) 
         s = f"Done reason: {self.done_reason}"
         plt.text(text_x, text_y * 8, s) 
@@ -388,75 +362,11 @@ class BaseSim:
         if wait:
             plt.show()
 
-    def min_render(self, wait=False):
-        """
-        TODO: deprecate
-        """
-        fig = plt.figure(4)
-        plt.clf()  
-
-        ret_map = self.env_map.scan_map
-        plt.imshow(ret_map)
-
-        # plt.xlim([0, self.env_map.width])
-        # plt.ylim([0, self.env_map.height])
-
-        s_x, s_y = self.env_map.convert_to_plot(self.env_map.start)
-        plt.plot(s_x, s_y, '*', markersize=12)
-
-        c_x, c_y = self.env_map.convert_to_plot([self.car.x, self.car.y])
-        plt.plot(c_x, c_y, '+', markersize=16)
-
-        for i in range(self.scan_sim.number_of_beams):
-            angle = i * self.scan_sim.dth + self.car.theta - self.scan_sim.fov/2
-            fs = self.scan_sim.scan_output[i] * self.scan_sim.n_searches * self.scan_sim.step_size
-            dx =  [np.sin(angle) * fs, np.cos(angle) * fs]
-            range_val = lib.add_locations([self.car.x, self.car.y], dx)
-            r_x, r_y = self.env_map.convert_to_plot(range_val)
-            x = [c_x, r_x]
-            y = [c_y, r_y]
-
-            plt.plot(x, y)
-
-        for pos in self.action_memory:
-            p_x, p_y = self.env_map.convert_to_plot(pos)
-            plt.plot(p_x, p_y, 'x', markersize=6)
-
-        text_start = self.env_map.width + 10
-        spacing = int(self.env_map.height / 10)
-
-        s = f"Reward: [{self.reward:.1f}]" 
-        plt.text(text_start, spacing*1, s)
-        s = f"Action: [{self.action[0]:.2f}, {self.action[1]:.2f}]"
-        plt.text(text_start, spacing*2, s) 
-        s = f"Done: {self.done}"
-        plt.text(text_start, spacing*3, s) 
-        s = f"Pos: [{self.car.x:.2f}, {self.car.y:.2f}]"
-        plt.text(text_start, spacing*4, s)
-        s = f"Vel: [{self.car.velocity:.2f}]"
-        plt.text(text_start, spacing*5, s)
-        s = f"Theta: [{(self.car.theta * 180 / np.pi):.2f}]"
-        plt.text(text_start, spacing*6, s) 
-        s = f"Delta x100: [{(self.car.steering*100):.2f}]"
-        plt.text(text_start, spacing*7, s) 
-        s = f"Theta Dot: [{(self.car.th_dot):.2f}]"
-        plt.text(text_start, spacing*8, s) 
-
-        s = f"Steps: {self.steps}"
-        plt.text(100, spacing*9, s)
-
-        plt.pause(0.0001)
-        if wait:
-            plt.show()
-    
     def get_target_obs(self):
         target = self.env_map.end_goal
-        pos = np.array([self.car.x, self.car.y])
+        pos = self.state[0:2]
         base_angle = lib.get_bearing(pos, target) 
-        # angle = base_angle - self.car.theta
-        angle = lib.sub_angles_complex(base_angle, self.car.theta)
-        # angle = lib.add_angles_complex(base_angle, self.car.theta)
-        # distance = lib.get_distance(pos, target)
+        angle = lib.sub_angles_complex(base_angle, self.state[2])
 
         em = self.env_map
         s = calculate_progress(pos, em.ref_pts, em.diffs, em.l2s, em.ss_normal)
@@ -467,7 +377,7 @@ class BaseSim:
         """
         Combines different parts of the simulator to get a state observation which can be returned.
         """
-        car_obs = self.car.get_car_state()
+        car_obs = self.state
         pose = car_obs[0:3]
         scan = self.scan_sim.scan(pose)
         target = self.get_target_obs()
@@ -480,6 +390,7 @@ class BaseSim:
 
         # observation = np.concatenate([car_obs, target, scan, [self.reward]])
         return observation
+
 
 @njit(cache=True)
 def calculate_progress(point, wpts, diffs, l2s, ss):
@@ -508,5 +419,69 @@ def calculate_progress(point, wpts, diffs, l2s, ss):
     s = s / ss[-1]
 
     return s 
+
+
+#Dynamics functions
+# @njit(cache=True)
+def update_kinematic_state(x, u, dt, whlb, max_steer, max_v):
+    """
+    Updates the kinematic state according to bicycle model
+
+    Args:
+        X: State, x, y, theta, velocity, steering
+        u: control action, d_dot, a
+    Returns
+        new_state: updated state of vehicle
+    """
+    dx = np.array([x[3]*np.sin(x[2]), # x
+                x[3]*np.cos(x[2]), # y
+                x[3]/whlb * np.tan(x[4]), # theta
+                u[1], # velocity
+                u[0]]) # steering
+
+    new_state = x + dx * dt 
+
+    # check limits
+    new_state[4] = min(new_state[4], max_steer)
+    new_state[4] = max(new_state[4], -max_steer)
+    new_state[3] = min(new_state[3], max_v)
+
+    return new_state
+
+# @njit(cache=True)
+def control_system(state, action, max_v, max_steer, max_a, max_d_dot):
+    """
+    Generates acceleration and steering velocity commands to follow a reference
+    Note: the controller gains are hand tuned in the fcn
+
+    Args:
+        v_ref: the reference velocity to be followed
+        d_ref: reference steering to be followed
+
+    Returns:
+        a: acceleration
+        d_dot: the change in delta = steering velocity
+    """
+    # clip action
+    v_ref = min(action[1], max_v)
+    d_ref = max(action[0], -max_steer)
+    d_ref = min(action[0], max_steer)
+
+    kp_a = 10
+    a = (v_ref-state[3])*kp_a
+    
+    kp_delta = 40
+    d_dot = (d_ref-state[4])*kp_delta
+
+    # clip actions
+    a = min(a, max_a)
+    a = max(a, -max_a)
+    d_dot = min(d_dot, max_d_dot)
+    d_dot = max(d_dot, -max_d_dot)
+    
+    u = np.array([d_dot, a])
+
+    return u
+
 
 

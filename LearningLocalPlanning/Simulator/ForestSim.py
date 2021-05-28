@@ -264,18 +264,18 @@ class ForestSim(BaseSim):
         """
         self.reward = 0 # normal
         # check if finished lap
-        dx = self.car.x - self.env_map.start_pose[0]
+        dx = self.state[0] - self.env_map.start_pose[0]
         dx_lim = self.env_map.forest_width * 0.5
-        if dx < dx_lim and self.car.y > self.env_map.end_y:
+        if dx < dx_lim and self.state[1] > self.env_map.end_y:
             self.done = True
             self.reward = 1
             self.done_reason = f"Lap complete"
 
         # check crash
-        elif self.env_map.check_scan_location([self.car.x, self.car.y]):
+        elif self.env_map.check_scan_location(self.state[0:2]):
             self.done = True
             self.reward = -1
-            self.done_reason = f"Crash obstacle: [{self.car.x:.2f}, {self.car.y:.2f}]"
+            self.done_reason = f"Crash obstacle: [{self.state[0]:.2f}, {self.state[1]:.2f}]"
         # horizontal_force = self.car.mass * self.car.th_dot * self.car.velocity
         # check forces
         # if horizontal_force > self.car.max_friction_force:
@@ -290,7 +290,7 @@ class ForestSim(BaseSim):
             self.reward = -1
             self.done_reason = f"Max steps"
         # check orientation
-        elif abs(self.car.theta) > 0.66*np.pi:
+        elif abs(self.state[2]) > 0.66*np.pi:
             self.done = True
             self.done_reason = f"Vehicle turned around"
             self.reward = -1
