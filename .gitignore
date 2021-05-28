@@ -6,3 +6,5 @@ LearningLocalPlanning.egg-info/
 LearningLocalPlanning/NavUtils/__pycache__/
 
 Vehicles/
+
+LearningLocalPlanning/Simulator/__pycache__/

@@ -4,7 +4,7 @@ from LearningLocalPlanning.NavAgents.AgentMod import ModVehicleTest
 from LearningLocalPlanning.NavAgents.Oracle import Oracle
 from LearningLocalPlanning.NavAgents.FollowTheGap import ForestFGM
 
-from toy_f110 import ForestSim
+from LearningLocalPlanning.Simulator.ForestSim import ForestSim
 
 import numpy as np
 import yaml
@@ -76,8 +76,9 @@ def load_conf(path, fname):
 
 """Test Functions"""
 def test_nav():
-    env = ForestSim(map_name)
-    vehicle = NavTestVehicle(nav_name, env.sim_conf)
+    sim_conf = load_conf("", "std_config")
+    env = ForestSim(map_name, sim_conf)
+    vehicle = NavTestVehicle(nav_name, sim_conf)
 
     test_single_vehicle(env, vehicle, True, test_n, wait=False)
 
@@ -91,15 +92,17 @@ def test_follow_the_gap():
 
 
 def test_oracle():
-    env = ForestSim(map_name)
-    vehicle = Oracle(env.sim_conf)
+    sim_conf = load_conf("", "std_config")
+    env = ForestSim(map_name, sim_conf)
+    vehicle = Oracle(sim_conf)
 
     test_single_vehicle(env, vehicle, True, test_n, True, wait=False)
 
 
 def test_mod():
-    env = ForestSim(map_name)
-    vehicle = ModVehicleTest(mod_name, map_name, env.sim_conf)
+    sim_conf = load_conf("", "std_config")
+    env = ForestSim(map_name, sim_conf)
+    vehicle = ModVehicleTest(mod_name, map_name, sim_conf)
 
     test_single_vehicle(env, vehicle, True, test_n, wait=False, vis=False)
 
