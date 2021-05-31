@@ -40,12 +40,12 @@ def train_vehicle(env, vehicle, steps):
 
 
 map_name = "forest2"
-n = 3
+n = 1
 nav_name = f"Navforest_{n}"
 mod_name = f"ModForest_{n}"
 repeat_name = f"RepeatTest_{n}"
 eval_name = f"CompareTest_{n}"
-train_n = 1000
+train_n = 200000
 
 def load_conf(path, fname):
     full_path = path + 'config/' + fname + '.yaml'

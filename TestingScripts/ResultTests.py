@@ -13,13 +13,13 @@ from argparse import Namespace
 
 
 map_name = "forest2"
-n = 3
+n = 1
 nav_name = f"Navforest_{n}"
 mod_name = f"ModForest_{n}"
 repeat_name = f"RepeatTest_{n}"
 eval_name = f"CompareTest_{n}"
 
-n_test = 5
+n_test = 100
 
 
 def load_conf(path, fname):
