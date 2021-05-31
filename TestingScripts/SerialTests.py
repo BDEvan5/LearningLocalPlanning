@@ -13,12 +13,13 @@ serial_name = f"Serialforest_{n}"
 
 
 train_n = 200000
-test_n = 10
+test_n = 100
 
 
 from LearningLocalPlanning.Simulator.ForestSim import ForestSim
 import yaml   
 from argparse import Namespace
+from ResultsTest import TestVehicles
 
 
 def load_conf(path, fname):
@@ -129,7 +130,37 @@ def test_serial():
     test_single_vehicle(env, vehicle, True, test_n, wait=False)
 
 
+
+
+def train_repeatability():
+    sim_conf = load_conf("", "std_config")
+    env = ForestSim(map_name, sim_conf)
+
+    for i in range(10):
+        train_name = f"ModRepeat_forest_{i}"
+
+        vehicle = SerialVehicleTrain(train_name, map_name, sim_conf, load=False)
+
+        train_vehicle(env, vehicle, train_n)
+
+
+def test_repeat():
+    sim_conf = load_conf("", "std_config")
+    env = ForestSim(map_name, sim_conf)
+    test = TestVehicles(sim_conf, repeat_name)
+
+    for i in range(10):
+        train_name = f"ModRepeat_forest_{i}"
+        vehicle = ModVehicleTest(train_name, map_name, sim_conf)
+        test.add_vehicle(vehicle)
+
+    # test.run_eval(env, 1000, False)
+    test.run_eval(env, n_test, False)
+
+
+
+
 if __name__ == "__main__":
-    train_serial()
+    # train_serial()
     test_serial()
 
