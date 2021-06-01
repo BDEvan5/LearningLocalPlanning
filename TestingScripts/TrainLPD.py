@@ -9,7 +9,7 @@ from argparse import Namespace
 
 
 map_name = "forest2"
-train_n = 1
+train_n = 2
 nav_name = f"Navforest_{train_n}"
 mod_name = f"ModForest_{train_n}"
 sap_safe_name = f"SapForest_safe_{train_n}"
@@ -36,7 +36,7 @@ def train_vehicle(env, vehicle, steps):
             vehicle.done_entry(s_prime)
             # vehicle.show_vehicle_history()
             # env.history.show_history()
-            # env.render(wait=False, name=vehicle.name)
+            env.render(wait=False, name=vehicle.name)
 
             vehicle.reset_lap()
             state = env.reset()
@@ -82,7 +82,7 @@ def train_sap_safe():
     sim_conf = load_conf("", "std_config")
     env = ForestSim(map_name, sim_conf)
     vehicle = SerialVehicleTrain(sap_safe_name, map_name, sim_conf, load=False, h_size=200)
-    # vehicle.reward_function = SafeReward()
+    vehicle.reward_function = SafeReward()
 
     train_vehicle(env, vehicle, train_n)
 
@@ -91,7 +91,7 @@ def train_sap_cth():
     sim_conf = load_conf("", "std_config")
     env = ForestSim(map_name, sim_conf)
     vehicle = SerialVehicleTrain(sap_cth_name, map_name, sim_conf, load=False, h_size=200)
-    # vehicle.reward_function = CthReward()
+    vehicle.reward_function = CthReward(0.004, 0.004)
 
     train_vehicle(env, vehicle, train_n)
 
@@ -103,11 +103,31 @@ def train_sap_dist():
     vehicle.reward_function = DistReward()
     train_vehicle(env, vehicle, train_n)
 
+
+def train_sap_cth2():
+    sim_conf = load_conf("", "std_config")
+    env = ForestSim(map_name, sim_conf)
+    vehicle = SerialVehicleTrain("TuneCTH_0004_0002", map_name, sim_conf, load=False, h_size=200)
+    vehicle.reward_function = CthReward(0.004, 0.002)
+
+    train_vehicle(env, vehicle, train_n)
+
+
+def train_sap_cth3():
+    sim_conf = load_conf("", "std_config")
+    env = ForestSim(map_name, sim_conf)
+    vehicle = SerialVehicleTrain("TuneCTH_0004_001", map_name, sim_conf, load=False, h_size=200)
+    vehicle.reward_function = CthReward(0.004, 0.01)
+
+    train_vehicle(env, vehicle, train_n)
+
 if __name__ == "__main__":
-    # train_sap_cth()
-    # train_sap_safe()
+    train_sap_cth()
+    train_sap_safe()
     train_sap_dist()
 
     # train_mod()
     # train_nav()
 
+    train_sap_cth2()
+    train_sap_cth3()

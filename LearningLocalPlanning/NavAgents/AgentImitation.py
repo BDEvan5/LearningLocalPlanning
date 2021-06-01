@@ -174,7 +174,7 @@ class BaseSAP(StdPP):
 
 
 class ImitationTrain(ImitationNet, BaseSAP): 
-    def __init__(self, agent_name, map_name, sim_conf, train_steps=5000):
+    def __init__(self, agent_name, map_name, sim_conf, train_steps=10000):
         ImitationNet.__init__(self, agent_name)
         BaseSAP.__init__(self, agent_name, map_name, sim_conf)
 
@@ -196,6 +196,7 @@ class ImitationTrain(ImitationNet, BaseSAP):
         nn_obs = self.transform_obs(obs)
         # TODO: add noise in these readings.
         nn_act = self.actor(nn_obs).detach().numpy()
+        nn_act += np.random.normal(0, 0.1, size=1)
 
         steering_angle = self.modify_references(nn_act)
         speed = calculate_speed(steering_angle)

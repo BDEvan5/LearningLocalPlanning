@@ -145,7 +145,7 @@ class ImitationNet:
 
             losses[i] = actor_loss
 
-            if i % 500 == 0:
+            if i % 1000 == 0:
                 print(f"Batch: {i}: Loss: {actor_loss}")
 
                 lib.plot(losses, 100)

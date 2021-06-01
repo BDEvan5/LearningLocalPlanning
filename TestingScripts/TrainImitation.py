@@ -95,10 +95,12 @@ class TrainDAgger:
     def run_dagger(self, n_batches):
         for i in range(n_batches):
             print(f"Running Batch: {i}")
-            self.collect_dagger_data()
+            self.collect_dagger_data(10000)
             self.agent.train()
 
     def collect_dagger_data(self, dset_size=5000):
+        crashes = 0
+        completes = 0
         state= self.env.reset()
         print(f"Starting Dataset generation: {self.oracle.name}")
         for i in range(dset_size):
@@ -110,18 +112,23 @@ class TrainDAgger:
             state = s_prime
 
             if done:
-                self.env.render(wait=False, name=self.agent.name)
+                # self.env.render(wait=False, name=self.agent.name)
+                if s_prime['reward'] == 1:
+                    completes += 1
+                else:
+                    crashes += 1
                 self.oracle.reset_lap()
                 state = self.env.reset()
 
             if i %1000 == 0:
                 print(f"Data generating... {i}")
+        print(f"Completes: {completes} --> Crashes: {crashes} --> Percent: {completes*100/(crashes+ completes)}")
 
 def train_dagger():
     sim_conf = load_conf("", "std_config")
     env = ForestSim(map_name, sim_conf)
     oracle = ForestFGM()
-    agent = ImitationTrain(d_name, map_name, sim_conf)
+    agent = ImitationTrain(d_name, map_name, sim_conf, 10000)
 
     d_train = TrainDAgger(oracle, env, agent)
 
@@ -129,8 +136,8 @@ def train_dagger():
     # agent.buffer.save_buffer(data_set_name)
 
     d_train.agent.buffer.load_data(data_set_name)
-    d_train.agent.train(20000) 
-    d_train.run_dagger(10)
+    d_train.agent.train(50000) 
+    d_train.run_dagger(15)
 
 
 def test_dagger():
@@ -141,7 +148,7 @@ def test_dagger():
     test_single_vehicle(env, agent, True, test_n)
 
 if __name__ == "__main__":
-    # train_dagger()
+    train_dagger()
     test_dagger()
 
 

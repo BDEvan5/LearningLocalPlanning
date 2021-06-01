@@ -132,13 +132,13 @@ def test_sap_cth():
 
 
 if __name__ == "__main__":
-    test_follow_the_gap()
+    # test_follow_the_gap()
     # test_oracle()
     # test_mod()
     # test_nav()
 
     # test_sap_cth()
-    # test_sap_dist()
+    test_sap_dist()
     # test_sap_safe()
 
 
