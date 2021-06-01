@@ -1,8 +1,7 @@
 from LearningLocalPlanning.NavAgents.SerialAgentPlanner import SerialVehicleTrain
-
 from LearningLocalPlanning.NavAgents.AgentNav import NavTrainVehicle
 from LearningLocalPlanning.NavAgents.AgentMod import ModVehicleTrain
-
+from LearningLocalPlanning.NavUtils.RewardFunctions import *
 
 from LearningLocalPlanning.Simulator.ForestSim import ForestSim
 import yaml   
@@ -17,7 +16,7 @@ sap_safe_name = f"SapForest_safe_{train_n}"
 sap_cth_name = f"SapForest_safe_{train_n}"
 sap_dist_name = f"SapForest_safe_{train_n}"
 eval_name = f"CompareTest_{train_n}"
-train_n = 1000
+train_n = 200000
 
 
 def train_vehicle(env, vehicle, steps):
@@ -84,7 +83,7 @@ def train_sap_safe():
     sim_conf = load_conf("", "std_config")
     env = ForestSim(map_name, sim_conf)
     vehicle = SerialVehicleTrain(sap_safe_name, map_name, sim_conf, load=False, h_size=200)
-    # vehicle.reward_fcn = SafeReward()
+    # vehicle.reward_function = SafeReward()
 
     train_vehicle(env, vehicle, train_n)
 
@@ -93,7 +92,7 @@ def train_sap_cth():
     sim_conf = load_conf("", "std_config")
     env = ForestSim(map_name, sim_conf)
     vehicle = SerialVehicleTrain(sap_cth_name, map_name, sim_conf, load=False, h_size=200)
-    # vehicle.reward_fcn = CthReward()
+    # vehicle.reward_function = CthReward()
 
     train_vehicle(env, vehicle, train_n)
 
@@ -102,14 +101,14 @@ def train_sap_dist():
     sim_conf = load_conf("", "std_config")
     env = ForestSim(map_name, sim_conf)
     vehicle = SerialVehicleTrain(sap_dist_name, map_name, sim_conf, load=False, h_size=200)
-    # vehicle.reward_fcn = DistReward()
+    vehicle.reward_function = DistReward()
     train_vehicle(env, vehicle, train_n)
 
 if __name__ == "__main__":
     # train_sap_cth()
     # train_sap_safe()
-    # train_sap_dist()
+    train_sap_dist()
 
-    train_mod()
-    train_nav()
+    # train_mod()
+    # train_nav()
 

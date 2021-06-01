@@ -213,11 +213,9 @@ class SerialVehicleTrain(SerialBase):
         self.nn_state = None
         self.nn_act = None
         self.action = None
+        self.reward_function = None
 
         self.t_his = TrainHistory(agent_name, load)
-
-    def set_reward_fcn(self, r_fcn):
-        self.reward_fcn = r_fcn
 
     def plan_act(self, obs):
         pp_action = super().act_pp(obs['state'])
@@ -238,16 +236,17 @@ class SerialVehicleTrain(SerialBase):
 
     def add_memory_entry(self, s_prime, nn_s_prime):
         if self.state is not None:
-            reward = self.calculate_reward(s_prime)
+            # reward = self.calculate_reward(s_prime)
+            reward = self.reward_function(self.state, s_prime)
 
             self.t_his.add_step_data(reward)
 
             self.agent.replay_buffer.add(self.nn_state, self.nn_act, nn_s_prime, reward, False)
 
-    def calculate_reward(self, s_prime):        
-        reward = s_prime['target'][1] - self.state['target'][1]
+    # def calculate_reward(self, s_prime):        
+    #     reward = s_prime['target'][1] - self.state['target'][1]
 
-        return reward
+    #     return reward
 
     def done_entry(self, s_prime):
         """
@@ -255,7 +254,8 @@ class SerialVehicleTrain(SerialBase):
         """
         pp_action = super().act_pp(s_prime['state'])
         nn_s_prime = self.transform_obs(s_prime, pp_action)
-        reward = s_prime['reward'] + self.calculate_reward(s_prime)
+        reward = s_prime['reward'] + self.reward_function(self.state, s_prime)
+        # reward = s_prime['reward'] + self.calculate_reward(s_prime)
 
         self.t_his.add_step_data(reward)
         self.t_his.lap_done(False)
