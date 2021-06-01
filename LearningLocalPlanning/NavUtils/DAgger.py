@@ -45,7 +45,8 @@ class BufferIL(object):
         if self.ptr == self.max_size-1: self.ptr=0 
 
     def sample(self, batch_size):
-        ind = np.random.randint(0, len(self.storage), size=batch_size)
+        
+        ind = np.random.randint(0, self.ptr, size=batch_size)
         states = np.zeros((batch_size, self.state_dim))
         actions = np.zeros((batch_size, self.act_dim))
 
@@ -59,14 +60,23 @@ class BufferIL(object):
         return self.ptr
 
     def load_data(self, name):
-        filename = "ImitationData/" + name + ".npy"
-        self.storage = np.load(filename)
+        filename = "ImitationData/" + name 
+        states = np.load(filename + "_states" + ".npy")
+        actions = np.load(filename + "_actions" + ".npy")
+        self.ptr = len(states)
 
-        print(f"Data loaded: type ({type(self.storage)})")
+        self.states = np.zeros((self.max_size, self.state_dim))
+        self.actions = np.zeros((self.max_size, self.act_dim))
+        self.states[0:self.ptr] = states 
+        self.actions[0:self.ptr] = actions
+
+        print(f"Data loaded: {filename} of type ({type(self.states)}) and len: {self.ptr}")
 
     def save_buffer(self, name):
         filename = "ImitationData/" + name
-        np.save(filename, self.storage)
+        np.save(filename + "_states", self.states[0:self.ptr])
+        np.save(filename + "_actions", self.actions[0:self.ptr])
+        print(f"Data saved as: {filename}")
 
 
 class Actor(nn.Module):   
@@ -88,12 +98,15 @@ class Actor(nn.Module):
 
 
 class ImitationNet:
-    def __init__(self, name) -> None:
+    def __init__(self, name, train_steps=5000, batch_size=100) -> None:
         self.actor = None
         self.name = name
         self.buffer = BufferIL()
 
-        # self.create()
+        self.train_steps = train_steps
+        self.batch_size = batch_size
+
+        self.create()
 
     def save(self, directory="Vehicles"):
         filename = '%s/%s_actor.pth' % (directory, self.name)
@@ -108,18 +121,20 @@ class ImitationNet:
     def create(self, obs_dim=14, h_size=200):
         self.actor = Actor(obs_dim, 1, 1, h_size)
 
-
-    def train(self, batches=5000):
-        losses = np.zeros(batches)
-        batch_size = 100
+    def train(self, train_steps=None):
+        if train_steps is None:
+            train_steps = self.train_steps
+        losses = np.zeros(train_steps)
+        if self.buffer.size() < self.batch_size:
+            return losses
 
         loss = nn.MSELoss()
         optimiser = optim.SGD(self.actor.parameters(), lr=0.001)
 
-        for i in range(batches):
-            x, u = self.buffer.sample(batch_size)
+        for i in range(train_steps):
+            x, u = self.buffer.sample(self.batch_size)
             state = torch.FloatTensor(x)
-            action = torch.FloatTensor(u)
+            action = torch.FloatTensor(u[:, 0])
 
             optimiser.zero_grad()
 
@@ -135,7 +150,8 @@ class ImitationNet:
 
                 lib.plot(losses, 100)
 
-                self.save()
+                # self.save()
+        self.save()
 
         return losses 
 

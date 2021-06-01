@@ -1,11 +1,12 @@
 import torch
 from LearningLocalPlanning.NavUtils.DAgger import ImitationNet
 from LearningLocalPlanning.NavUtils.speed_utils import calculate_speed
+from LearningLocalPlanning.NavUtils import pure_pursuit_utils
 
 import numpy as np 
+import csv as csv
 
-
-class ImitationPP:
+class StdPP:
     def __init__(self, sim_conf) -> None:
         self.path_name = None
 
@@ -64,7 +65,22 @@ class ImitationPP:
         self.aim_pts.clear()
 
 
-class ImitationBase(ImitationPP):
+def add_locations(x1=[0, 0], x2=[0, 0], dx=1):
+    # dx is a scaling factor
+    ret = [0.0, 0.0]
+    for i in range(2):
+        ret[i] = x1[i] + x2[i] * dx
+    return np.array(ret)
+
+def sub_locations(x1=[0, 0], x2=[0, 0], dx=1):
+    # dx is a scaling factor
+    ret = [0.0, 0.0]
+    for i in range(2):
+        ret[i] = x1[i] - x2[i] * dx
+    return ret
+
+
+class BaseSAP(StdPP):
     def __init__(self, agent_name, map_name, sim_conf) -> None:
         super().__init__(sim_conf)
         self.name = agent_name
@@ -73,13 +89,11 @@ class ImitationBase(ImitationPP):
         self.max_steer = sim_conf.max_steer
         self.range_finder_scale = 5 #TODO: move to config files
 
-        self.history = ModHistory()
-
         self.distance_scale = 20 # max meters for scaling
 
         self._load_csv_track(map_name)
 
-    def transform_obs(self, obs, pp_action):
+    def transform_obs(self, obs):
         """
         Transforms the observation received from the environment into a vector which can be used with a neural network.
     
@@ -91,6 +105,7 @@ class ImitationBase(ImitationPP):
             nn_obs: observation vector for neural network
         """
         state = obs['state']
+        pp_action = super().act_pp(state)
         scan = obs['scan']/ self.range_finder_scale
         target = obs['target']
 
@@ -145,9 +160,9 @@ class ImitationBase(ImitationPP):
         new_line = []
         new_vs = []
         for i in range(len(o_line)-1):
-            dd = lib.sub_locations(o_line[i+1], o_line[i])
+            dd = sub_locations(o_line[i+1], o_line[i])
             for j in range(n):
-                pt = lib.add_locations(o_line[i], dd, dz*j)
+                pt = add_locations(o_line[i], dd, dz*j)
                 new_line.append(pt)
 
                 dv = o_vs[i+1] - o_vs[i]
@@ -158,59 +173,51 @@ class ImitationBase(ImitationPP):
 
 
 
-class ImitationTrain(ImitationNet, ImitationBase): 
-    def __init__(self, agent_name, sim_conf):
+class ImitationTrain(ImitationNet, BaseSAP): 
+    def __init__(self, agent_name, map_name, sim_conf, train_steps=5000):
         ImitationNet.__init__(self, agent_name)
-        ImitationBase.__init__(self, agent_name, sim_conf)
+        BaseSAP.__init__(self, agent_name, map_name, sim_conf)
 
         self.max_v = sim_conf.max_v
         self.max_steer = sim_conf.max_steer
         self.distance_scale = 10
 
+        self.train_steps = train_steps 
+
     def load_buffer(self, buffer_name):
         self.buffer.load_data(buffer_name)
-
-    def aggregate_buffer(self, new_buffer):
-        for sample in new_buffer.storage:
-            self.buffer.add(sample)
-
-        new_buffer.storage.clear()
-        new_buffer.ptr = 0
 
     def save_step(self, state, action):
         nn_obs = self.transform_obs(state)
         action = action[0] / self.max_steer
-        self.buffer.add((nn_obs, action))
+        self.buffer.add(nn_obs, action)
 
     def plan_act(self, obs):
-        pp_action = super().act_pp(obs['state'])
-        nn_obs = self.transform_obs(obs, pp_action)
+        nn_obs = self.transform_obs(obs)
+        # TODO: add noise in these readings.
+        nn_act = self.actor(nn_obs).detach().numpy()
 
-        nn_act = self.actor(nn_obs)
-
-        self.add_memory_entry(obs, nn_obs)
-
-        self.state = obs
-        nn_action = self.agent.act(nn_obs)
-        self.nn_act = nn_action
-
-        self.nn_state = nn_obs
-
-        steering_angle = self.modify_references(self.nn_act, pp_action[0])
+        steering_angle = self.modify_references(nn_act)
         speed = calculate_speed(steering_angle)
         self.action = np.array([steering_angle, speed])
 
         return self.action
 
-    def add_memory_entry(self, state, action):
-        
 
-
-class ImitationTest(ImitationBase):
-    def __init__(self, agent_name, sim_conf) -> None:
-        ImitationBase.__init__(self, agent_name, sim_conf)
+class ImitationTest(BaseSAP):
+    def __init__(self, agent_name, map_name, sim_conf) -> None:
+        BaseSAP.__init__(self, agent_name, map_name, sim_conf)
 
         filename = '%s/%s_actor.pth' % ("Vehicles", self.name)
         self.actor = torch.load(filename)
 
+    def plan_act(self, obs):
+        nn_obs = self.transform_obs(obs)
+        nn_act = self.actor(nn_obs).detach().numpy()
+
+        steering_angle = self.modify_references(nn_act)
+        speed = calculate_speed(steering_angle)
+        self.action = np.array([steering_angle, speed])
+
+        return self.action
 

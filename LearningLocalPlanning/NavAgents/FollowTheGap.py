@@ -16,6 +16,7 @@ class ForestFGM:
         self.degrees_per_elem = None
         self.name = "Follow the Forest Gap"
         self.n_beams = 1000
+        self.max_steer = 0.4
     
     def preprocess_lidar(self, ranges):
         self.degrees_per_elem = (180) / len(ranges)
@@ -65,15 +66,14 @@ class ForestFGM:
         return steering_angle
 
     def plan_act(self, obs):
-        scan = obs['scan']
+        scan = obs['full_scan']
         ranges = np.array(scan, dtype=np.float)
 
         steering_angle = self.process_lidar(ranges)
         steering_angle = steering_angle * np.pi / 180
+        steering_angle = np.clip(steering_angle, -self.max_steer, self.max_steer)
 
-        # speed = 4
         speed = calculate_speed(steering_angle)
-
         action = np.array([steering_angle, speed])
 
         return action

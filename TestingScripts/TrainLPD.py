@@ -13,14 +13,13 @@ train_n = 1
 nav_name = f"Navforest_{train_n}"
 mod_name = f"ModForest_{train_n}"
 sap_safe_name = f"SapForest_safe_{train_n}"
-sap_cth_name = f"SapForest_safe_{train_n}"
-sap_dist_name = f"SapForest_safe_{train_n}"
+sap_cth_name = f"SapForest_cth_{train_n}"
+sap_dist_name = f"SapForest_dist_{train_n}"
 eval_name = f"CompareTest_{train_n}"
 train_n = 200000
 
 
 def train_vehicle(env, vehicle, steps):
-    done = False
     state = env.reset()
 
     print(f"Starting Training: {vehicle.name}")

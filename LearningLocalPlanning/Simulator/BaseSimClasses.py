@@ -379,16 +379,17 @@ class BaseSim:
         """
         car_obs = self.state
         pose = car_obs[0:3]
-        scan = self.scan_sim.scan(pose)
+        full_scan = self.scan_sim.scan(pose, 1000)
+        scan = self.scan_sim.scan(pose, 10)
         target = self.get_target_obs()
 
         observation = {}
         observation['state'] = car_obs
         observation['scan'] = scan 
+        observation['full_scan'] = full_scan
         observation['target'] = target
         observation['reward'] = self.reward
 
-        # observation = np.concatenate([car_obs, target, scan, [self.reward]])
         return observation
 
 
@@ -422,7 +423,7 @@ def calculate_progress(point, wpts, diffs, l2s, ss):
 
 
 #Dynamics functions
-# @njit(cache=True)
+@njit(cache=True)
 def update_kinematic_state(x, u, dt, whlb, max_steer, max_v):
     """
     Updates the kinematic state according to bicycle model
@@ -448,7 +449,7 @@ def update_kinematic_state(x, u, dt, whlb, max_steer, max_v):
 
     return new_state
 
-# @njit(cache=True)
+@njit(cache=True)
 def control_system(state, action, max_v, max_steer, max_a, max_d_dot):
     """
     Generates acceleration and steering velocity commands to follow a reference
