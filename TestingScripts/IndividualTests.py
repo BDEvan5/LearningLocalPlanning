@@ -3,6 +3,7 @@ from LearningLocalPlanning.NavAgents.AgentNav import NavTestVehicle
 from LearningLocalPlanning.NavAgents.AgentMod import ModVehicleTest 
 from LearningLocalPlanning.NavAgents.Oracle import Oracle
 from LearningLocalPlanning.NavAgents.FollowTheGap import ForestFGM
+from LearningLocalPlanning.NavAgents.SerialAgentPlanner import SerialVehicleTest
 
 from LearningLocalPlanning.Simulator.ForestSim import ForestSim
 
@@ -12,13 +13,15 @@ from argparse import Namespace
 
 
 map_name = "forest2"
-n = 3
-nav_name = f"Navforest_{n}"
-mod_name = f"ModForest_{n}"
-repeat_name = f"RepeatTest_{n}"
-eval_name = f"CompareTest_{n}"
+train_n = 1
+nav_name = f"Navforest_{train_n}"
+mod_name = f"ModForest_{train_n}"
+sap_safe_name = f"SapForest_safe_{train_n}"
+sap_cth_name = f"SapForest_cth_{train_n}"
+sap_dist_name = f"SapForest_dist_{train_n}"
 
-test_n = 10
+
+test_n = 100
 
 """General test function"""
 def test_single_vehicle(env, vehicle, show=False, laps=100, add_obs=True, wait=False, vis=False):
@@ -106,12 +109,37 @@ def test_mod():
 
     test_single_vehicle(env, vehicle, True, test_n, wait=False, vis=False)
 
+def test_sap_safe():
+    sim_conf = load_conf("", "std_config")
+    env = ForestSim(map_name, sim_conf)
+    vehicle = SerialVehicleTest(sap_safe_name, map_name, sim_conf)
+
+    test_single_vehicle(env, vehicle, True, test_n, wait=False, vis=False)
+
+def test_sap_dist():
+    sim_conf = load_conf("", "std_config")
+    env = ForestSim(map_name, sim_conf)
+    vehicle = SerialVehicleTest(sap_dist_name, map_name, sim_conf)
+
+    test_single_vehicle(env, vehicle, True, test_n, wait=False, vis=False)
+
+def test_sap_cth():
+    sim_conf = load_conf("", "std_config")
+    env = ForestSim(map_name, sim_conf)
+    vehicle = SerialVehicleTest(sap_cth_name, map_name, sim_conf)
+
+    test_single_vehicle(env, vehicle, True, test_n, wait=False, vis=False)
+
 
 if __name__ == "__main__":
     # test_follow_the_gap()
     # test_oracle()
     # test_mod()
-    test_nav()
+    # test_nav()
+
+    # test_sap_cth()
+    test_sap_dist()
+    # test_sap_safe()
 
 
 

@@ -1,0 +1,59 @@
+
+Testing Complete 
+Map name:  
+-----------------------------------------------------
+-----------------------------------------------------
+Vehicle: Navforest_1
+Crashes: 781.0 --> Completes 219.0
+% Finished = 21.90
+Avg lap times: 847.1324200913242
+No Obs Time: 925.0
+-----------------------------------------------------
+Vehicle: Follow the Forest Gap
+Crashes: 5.0 --> Completes 995.0
+% Finished = 99.50
+Avg lap times: 433.19095477386935
+No Obs Time: 373.0
+-----------------------------------------------------
+Vehicle: Oracle Path Follower
+Crashes: 0.0 --> Completes 1000.0
+% Finished = 100.00
+Avg lap times: 383.326
+No Obs Time: 372.0
+-----------------------------------------------------
+Vehicle: ModForest_1
+Crashes: 625.0 --> Completes 375.0
+% Finished = 37.50
+Avg lap times: 646.9413333333333
+No Obs Time: 719.0
+-----------------------------------------------------
+Vehicle: SapForest_cth_1
+Crashes: 71.0 --> Completes 929.0
+% Finished = 92.90
+Avg lap times: 696.6200215285253
+No Obs Time: 483.0
+-----------------------------------------------------
+Vehicle: TuneCTH_0004_0002
+Crashes: 76.0 --> Completes 924.0
+% Finished = 92.40
+Avg lap times: 627.487012987013
+No Obs Time: 582.0
+-----------------------------------------------------
+Vehicle: TuneCTH_0004_001
+Crashes: 217.0 --> Completes 783.0
+% Finished = 78.30
+Avg lap times: 1184.3205619412515
+No Obs Time: 973.0
+-----------------------------------------------------
+Vehicle: SapForest_safe_1
+Crashes: 42.0 --> Completes 958.0
+% Finished = 95.80
+Avg lap times: 441.2713987473904
+No Obs Time: 394.0
+-----------------------------------------------------
+Vehicle: SapForest_dist_1
+Crashes: 55.0 --> Completes 945.0
+% Finished = 94.50
+Avg lap times: 412.226455026455
+No Obs Time: 372.0
+-----------------------------------------------------
