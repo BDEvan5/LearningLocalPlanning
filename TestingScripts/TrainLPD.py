@@ -9,7 +9,7 @@ from argparse import Namespace
 
 
 map_name = "forest2"
-train_n = 2
+train_n = 1
 nav_name = f"Navforest_{train_n}"
 mod_name = f"ModForest_{train_n}"
 sap_safe_name = f"SapForest_safe_{train_n}"
@@ -36,7 +36,7 @@ def train_vehicle(env, vehicle, steps):
             vehicle.done_entry(s_prime)
             # vehicle.show_vehicle_history()
             # env.history.show_history()
-            env.render(wait=False, name=vehicle.name)
+            # env.render(wait=False, name=vehicle.name)
 
             vehicle.reset_lap()
             state = env.reset()

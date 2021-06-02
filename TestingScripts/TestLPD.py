@@ -23,7 +23,7 @@ sap_dist_name = f"SapForest_dist_{train_n}"
 
 eval_name = f"CompareTestLPD_{train_n}"
 
-n_test = 10
+n_test = 1000
 
 
 def load_conf(path, fname):
@@ -204,6 +204,10 @@ def comparison_test():
     test.add_vehicle(vehicle)
 
     vehicle = SerialVehicleTest(sap_cth_name, map_name, sim_conf)
+    test.add_vehicle(vehicle)
+    vehicle = SerialVehicleTest("TuneCTH_0004_0002", map_name, sim_conf)
+    test.add_vehicle(vehicle)
+    vehicle = SerialVehicleTest("TuneCTH_0004_001", map_name, sim_conf)
     test.add_vehicle(vehicle)
 
     vehicle = SerialVehicleTest(sap_safe_name, map_name, sim_conf)
