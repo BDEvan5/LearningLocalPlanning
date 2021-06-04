@@ -8,7 +8,7 @@ from LearningLocalPlanning.NavAgents.FollowTheGap import ForestFGM
 from LearningLocalPlanning.Simulator.ForestSim import ForestSim
 
 
-train_n = 1 
+train_n = 2
 d_name = f"dagger_{train_n}"
 map_name = "forest2"
 data_set_name = f"dataset_{train_n}"
@@ -132,8 +132,8 @@ def train_dagger():
 
     d_train = TrainDAgger(oracle, env, agent)
 
-    # d_train.generate_oracle_data_set(20000)
-    # agent.buffer.save_buffer(data_set_name)
+    d_train.generate_oracle_data_set(20000)
+    agent.buffer.save_buffer(data_set_name)
 
     d_train.agent.buffer.load_data(data_set_name)
     d_train.agent.train(50000) 

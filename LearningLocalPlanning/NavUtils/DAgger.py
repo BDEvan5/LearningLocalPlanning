@@ -118,7 +118,7 @@ class ImitationNet:
 
         self.actor = torch.load(filename)
 
-    def create(self, obs_dim=14, h_size=200):
+    def create(self, obs_dim=14, h_size=500):
         self.actor = Actor(obs_dim, 1, 1, h_size)
 
     def train(self, train_steps=None):
