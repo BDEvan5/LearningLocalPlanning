@@ -7,6 +7,14 @@ class DistReward:
 
         return reward
 
+
+class SuperSafeReward:
+    # @staticmethod
+    def __call__(self, state, s_prime):        
+        reward = s_prime['target'][1] - state['target'][1]
+
+        return reward
+
 class SafeReward:
     # @staticmethod
     def __call__(self, state, s_prime):        
