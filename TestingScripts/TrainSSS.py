@@ -11,8 +11,8 @@ from argparse import Namespace
 map_name = "forest2"
 train_n = 1
 sap_dist_name = f"SapForest_sss_{train_n}"
-# train_n = 200000
-train_n = 1000
+train_n = 200000
+# train_n = 1000
 
 
 test_n = 100
@@ -37,7 +37,6 @@ def test_single_vehicle(env, vehicle, show=False, laps=100, add_obs=True, wait=F
             # env.render(False)
         if show:
             # env.history.show_history()
-            # vehicle.history.save_nn_output()
             env.render(wait=False, name=vehicle.name)
             if wait:
                 env.render(wait=True)
@@ -45,6 +44,8 @@ def test_single_vehicle(env, vehicle, show=False, laps=100, add_obs=True, wait=F
         if r == -1:
             crashes += 1
             print(f"({i}) Crashed -> time: {env.steps} ")
+            env.render(wait=True, name=vehicle.name)
+
         else:
             completes += 1
             print(f"({i}) Complete -> time: {env.steps}")
@@ -77,6 +78,7 @@ def train_vehicle(env, vehicle, steps):
         
         if done:
             vehicle.done_entry(s_prime)
+            print(f"Reward: {s_prime['reward']}")
             # vehicle.show_vehicle_history()
             # env.history.show_history()
             # env.render(wait=False, name=vehicle.name)

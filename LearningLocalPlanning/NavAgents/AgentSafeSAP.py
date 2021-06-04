@@ -244,8 +244,7 @@ class SerialVehicleTrain(SerialBase):
         if self.state is not None:
             # reward = self.calculate_reward(s_prime)
             reward = self.reward_function(self.state, s_prime)
-            if self.mod_flag:
-                reward -= mod_punishment
+            # reward += self.mod_flag
 
             self.t_his.add_step_data(reward)
 

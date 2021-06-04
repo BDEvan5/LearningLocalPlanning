@@ -1,4 +1,5 @@
 
+from LearningLocalPlanning.NavUtils.SSS_utils import plot_safety_scan
 import numpy as np
 from numba import njit, jit 
 from matplotlib import pyplot as plt
@@ -6,25 +7,29 @@ from scipy.ndimage import distance_transform_edt as edt
 
 
 def run_safety_check(obs, pp_action, max_steer, max_d_dot):
-        scan = obs['full_scan']
-        state = obs['state']
+    scan = obs['full_scan']
+    state = obs['state']
 
-        dw_ds = build_dynamic_window(state[4], max_steer, max_d_dot, 0.1)
+    dw_ds = build_dynamic_window(state[4], max_steer, max_d_dot, 0.1)
 
-        valid_window, starts, ends = check_dw_vo(scan, dw_ds)
+    valid_window, starts, ends = check_dw_vo(scan, dw_ds)
 
-        if not valid_window.any():
-            print(f"Massive problem: no valid answers")
-            return pp_action, False
-        
-        valid_dt = edt(valid_window)
-        new_action = modify_action(pp_action, valid_window, dw_ds, valid_dt)
+    if not valid_window.any():
+        print(f"Massive problem: no valid answers")
+        # plot_safety_scan(scan, starts, ends, dw_ds, valid_window, pp_action, pp_action)
+        # plt.show()
+        return pp_action, -1
+    
+    valid_dt = edt(valid_window)
+    new_action = modify_action(pp_action, valid_window, dw_ds, valid_dt)
 
-        modified_flag = False
-        if new_action[0] != pp_action[0]: 
-            modified_flag = True 
+    # plot_safety_scan(scan, starts, ends, dw_ds, valid_window, pp_action, new_action)
 
-        return new_action, modified_flag
+    modified_flag = 0
+    if new_action[0] != pp_action[0]: 
+        modified_flag = -0.4 
+
+    return new_action, modified_flag
 
 @njit(cache=True) 
 def build_dynamic_window(delta, max_steer, max_d_dot, dt):
@@ -38,7 +43,9 @@ def build_dynamic_window(delta, max_steer, max_d_dot, dt):
 
 @njit(cache=True) 
 def check_dw_vo(scan, dw_ds):
+    # tuneable parameters
     d_cone = 1.6
+    angle_buffer = 0.06
     L = 0.33
 
     angles = np.arange(1000) * np.pi / 999 -  np.ones(1000) * np.pi/2 
@@ -48,15 +55,18 @@ def check_dw_vo(scan, dw_ds):
 
     invalids = inds[scan<d_cone]
     starts1 = invalids[1:][invalids[1:] != invalids[:-1] + 1]
-    starts = np.concatenate((np.zeros(1), starts1))
+    starts = np.concatenate((np.zeros(1, dtype=np.uint8), starts1))
     ends1 = invalids[:-1][invalids[1:] != invalids[:-1] + 1]
     ends = np.append(ends1, invalids[-1])
 
-    for s, e in zip(starts, ends):
-        s = int(s)
-        e = int(e)
-        d_min = np.arctan(2*L*np.sin(angles[s])/scan[s])
-        d_max = np.arctan(2*L*np.sin(angles[e])/scan[e])
+    for i in range(len(starts)):
+    # for i, s, e in enumerate(zip(starts, ends)):
+        # if i == 0 or i == len(starts) -1:
+        #     continue
+        s = int(starts[i])
+        e = int(ends[i])
+        d_min = np.arctan(2*L*np.sin(angles[s]-angle_buffer)/scan[s])
+        d_max = np.arctan(2*L*np.sin(angles[e]+angle_buffer)/scan[e])
 
         d_min = max(d_min, dw_ds[0])
         d_max = min(d_max, dw_ds[-1]+0.001)
