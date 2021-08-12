@@ -15,7 +15,8 @@ def plot_safety_scan(scan, starts, ends, dw_ds, valid_window, pp_action, new_act
     # plt.xlim([-1.5, 1.5])
     plt.xlim([-4, 4])
 
-    xs, ys = segment_lidar_scan(scan)
+    # xs, ys = segment_lidar_scan(scan)
+    xs, ys = convert_scan_xy(scan)
     plt.plot(xs, ys, '-+')
 
     sines, cosines = get_trigs(len(scan))
