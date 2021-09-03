@@ -35,7 +35,7 @@ class TrainHistory():
 
     def add_step_data(self, new_r):
         self.ep_reward += new_r
-        # self.ep_rewards.append(new_r)
+        self.ep_rewards.append(new_r)
         self.ep_counter += 1
         self.t_counter += 1 
 
@@ -47,7 +47,7 @@ class TrainHistory():
         if show_reward:
             plt.figure(8)
             plt.clf()
-            plt.plot(self.ep_rewards[0:self.ptr])
+            plt.plot(self.ep_rewards)
             plt.plot(self.ep_rewards, 'x', markersize=10)
             plt.title(f"Ep rewards: total: {self.ep_reward:.4f}")
             plt.ylim([-1.1, 1.5])
@@ -55,7 +55,7 @@ class TrainHistory():
 
         self.ep_counter = 0
         self.ep_reward = 0
-        # self.ep_rewards = []
+        self.ep_rewards = []
 
 
     def print_update(self, plot_reward=True):

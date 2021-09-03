@@ -33,7 +33,7 @@ class WptReplaceBase:
             pts[i] = self.trajectory._get_current_waypoint(pts[i-1], step_distance)[0:2]
         
         # make pts relative
-        x_scale = 0.5 
+        x_scale = 1
         y_scale = 1.5 
         r_pts = pts -  np.ones((n_pts, 2)) * state[0:2]
         r_pts[:, 0] = r_pts[:, 0] / x_scale 
@@ -73,6 +73,7 @@ class WptReplaceTrain(WptReplaceBase):
         """
         self.obs = obs
         nn_obs = self.transform_obs(obs)
+        self.add_memory_entry(obs, nn_obs)
         nn_act = self.agent.act(nn_obs)
 
         self.nn_obs = nn_obs 
@@ -81,10 +82,14 @@ class WptReplaceTrain(WptReplaceBase):
         steering_angle = nn_act[0] * self.max_steer
         action = [steering_angle, self.v]
 
+        if np.isnan(steering_angle):
+            nn_act = self.agent.act(nn_obs)
+            raise ValueError("Steering angle")
+
         return action
 
     def add_memory_entry(self, s_prime, nn_s_prime):
-        if self.obs is not None:
+        if self.nn_act is not None:
             reward = self.calculate_reward(s_prime)
 
             self.t_his.add_step_data(reward)
@@ -92,7 +97,8 @@ class WptReplaceTrain(WptReplaceBase):
             self.agent.replay_buffer.add(self.nn_obs, self.nn_act, nn_s_prime, reward, False)
 
     def calculate_reward(self, s_prime):
-        reward = s_prime['target'][1] - self.obs['target'][1]
+        # reward = s_prime['target'][1] - self.obs['target'][1]
+        reward = -np.abs(self.nn_act[0]) /5
 
         return reward
 
@@ -104,7 +110,7 @@ class WptReplaceTrain(WptReplaceBase):
         reward = s_prime['reward'] + self.calculate_reward(s_prime)
 
         self.t_his.add_step_data(reward)
-        self.t_his.lap_done(False)
+        self.t_his.lap_done(True)
         if self.t_his.ptr % 10 == 0:
             self.t_his.print_update(True)
             self.agent.save(self.path)
