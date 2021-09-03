@@ -1,0 +1,65 @@
+
+Testing Complete 
+Map name:  
+-----------------------------------------------------
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest2_1
+Crashes: 123.0 --> Completes 877.0
+% Finished = 87.70
+Avg lap times: 495.0638540478905
+No Obs Time: 420.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest2_2
+Crashes: 201.0 --> Completes 799.0
+% Finished = 79.90
+Avg lap times: 438.1226533166458
+No Obs Time: 376.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest2_3
+Crashes: 194.0 --> Completes 806.0
+% Finished = 80.60
+Avg lap times: 472.9218362282878
+No Obs Time: 374.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest2_4
+Crashes: 59.0 --> Completes 941.0
+% Finished = 94.10
+Avg lap times: 562.0414452709883
+No Obs Time: 403.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest2_5
+Crashes: 170.0 --> Completes 830.0
+% Finished = 83.00
+Avg lap times: 469.5144578313253
+No Obs Time: 378.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest2_6
+Crashes: 217.0 --> Completes 783.0
+% Finished = 78.30
+Avg lap times: 459.4584929757344
+No Obs Time: 374.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest2_7
+Crashes: 105.0 --> Completes 895.0
+% Finished = 89.50
+Avg lap times: 421.4290502793296
+No Obs Time: 374.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest2_8
+Crashes: 264.0 --> Completes 736.0
+% Finished = 73.60
+Avg lap times: 537.148097826087
+No Obs Time: 420.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest2_9
+Crashes: 97.0 --> Completes 903.0
+% Finished = 90.30
+Avg lap times: 552.8992248062016
+No Obs Time: 398.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest2_10
+Crashes: 129.0 --> Completes 871.0
+% Finished = 87.10
+Avg lap times: 511.5200918484501
+No Obs Time: 403.0
+-----------------------------------------------------

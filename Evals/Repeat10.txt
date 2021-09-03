@@ -1,0 +1,65 @@
+
+Testing Complete 
+Map name:  
+-----------------------------------------------------
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest10_1
+Crashes: 5.0 --> Completes 95.0
+% Finished = 95.00
+Avg lap times: 424.70526315789476
+No Obs Time: 374.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest10_2
+Crashes: 5.0 --> Completes 95.0
+% Finished = 95.00
+Avg lap times: 420.0105263157895
+No Obs Time: 378.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest10_3
+Crashes: 4.0 --> Completes 96.0
+% Finished = 96.00
+Avg lap times: 445.4791666666667
+No Obs Time: 421.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest10_4
+Crashes: 4.0 --> Completes 96.0
+% Finished = 96.00
+Avg lap times: 463.5208333333333
+No Obs Time: 376.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest10_5
+Crashes: 3.0 --> Completes 97.0
+% Finished = 97.00
+Avg lap times: 461.50515463917526
+No Obs Time: 409.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest10_6
+Crashes: 4.0 --> Completes 96.0
+% Finished = 96.00
+Avg lap times: 412.4166666666667
+No Obs Time: 372.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest10_7
+Crashes: 4.0 --> Completes 96.0
+% Finished = 96.00
+Avg lap times: 444.7291666666667
+No Obs Time: 389.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest10_8
+Crashes: 8.0 --> Completes 92.0
+% Finished = 92.00
+Avg lap times: 436.0
+No Obs Time: 384.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest10_9
+Crashes: 6.0 --> Completes 94.0
+% Finished = 94.00
+Avg lap times: 420.5851063829787
+No Obs Time: 373.0
+-----------------------------------------------------
+Vehicle: SAPRepeat_forest10_10
+Crashes: 1.0 --> Completes 99.0
+% Finished = 99.00
+Avg lap times: 413.95959595959596
+No Obs Time: 372.0
+-----------------------------------------------------
