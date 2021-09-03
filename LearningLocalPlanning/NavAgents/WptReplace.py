@@ -98,7 +98,8 @@ class WptReplaceTrain(WptReplaceBase):
 
     def calculate_reward(self, s_prime):
         # reward = s_prime['target'][1] - self.obs['target'][1]
-        reward = -np.abs(self.nn_act[0]) /5
+        # reward = -np.abs(self.nn_act[0]) /5
+        reward = (1 - np.abs(s_prime['state'][0]-1)) / 10
 
         return reward
 

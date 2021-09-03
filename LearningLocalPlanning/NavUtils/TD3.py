@@ -153,6 +153,57 @@ class Critic(nn.Module):
         return x1
 
 
+class ActorAF(nn.Module):   
+    def __init__(self, state_dim, action_dim, max_action, h_size):
+        super(ActorAF, self).__init__()
+
+        self.l1 = nn.Linear(state_dim, h_size)
+        self.l2 = nn.Linear(h_size, h_size)
+        self.l3 = nn.Linear(h_size, action_dim)
+
+        self.max_action = max_action
+
+    def forward(self, x):
+        x = torch.tanh(self.l1(x))
+        x = torch.tanh(self.l2(x))
+        x = self.max_action * torch.tanh(self.l3(x)) 
+        return x
+
+class CriticAF(nn.Module):
+    def __init__(self, state_dim, action_dim, h_size):
+        super(CriticAF, self).__init__()
+
+        # Q1 architecture
+        self.l1 = nn.Linear(state_dim + action_dim, h_size)
+        self.l2 = nn.Linear(h_size, h_size)
+        self.l3 = nn.Linear(h_size, 1)
+
+        # Q2 architecture
+        self.l4 = nn.Linear(state_dim + action_dim, h_size)
+        self.l5 = nn.Linear(h_size, h_size)
+        self.l6 = nn.Linear(h_size, 1)
+
+    def forward(self, x, u):
+        xu = torch.cat([x, u], 1)
+
+        x1 = torch.tanh(self.l1(xu))
+        x1 = torch.tanh(self.l2(x1))
+        x1 = self.l3(x1)
+
+        x2 = torch.tanh(self.l4(xu))
+        x2 = torch.tanh(self.l5(x2))
+        x2 = self.l6(x2)
+        return x1, x2
+
+    def Q1(self, x, u):
+        xu = torch.cat([x, u], 1)
+
+        x1 = torch.tanh(self.l1(xu))
+        x1 = torch.tanh(self.l2(x1))
+        x1 = self.l3(x1)
+        return x1
+
+
 class TD3(object):
     def __init__(self, state_dim, action_dim, max_action, name):
         self.name = name
@@ -175,13 +226,13 @@ class TD3(object):
         state_dim = self.state_dim
         action_dim = self.act_dim
         max_action = self.max_action
-        self.actor = Actor(state_dim, action_dim, max_action, h_size)
-        self.actor_target = Actor(state_dim, action_dim, max_action, h_size)
+        self.actor = ActorAF(state_dim, action_dim, max_action, h_size)
+        self.actor_target = ActorAF(state_dim, action_dim, max_action, h_size)
         self.actor_target.load_state_dict(self.actor.state_dict())
         self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=1e-3)
 
-        self.critic = Critic(state_dim, action_dim, h_size)
-        self.critic_target = Critic(state_dim, action_dim, h_size)
+        self.critic = CriticAF(state_dim, action_dim, h_size)
+        self.critic_target = CriticAF(state_dim, action_dim, h_size)
         self.critic_target.load_state_dict(self.critic.state_dict())
         self.critic_optimizer = torch.optim.Adam(self.critic.parameters(), lr=1e-3)
 
