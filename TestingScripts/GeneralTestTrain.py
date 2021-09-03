@@ -1,27 +1,11 @@
-from LearningLocalPlanning.NavAgents.SerialAgentPlanner import SerialVehicleTest, SerialVehicleTrain
-
-from LearningLocalPlanning.Simulator.ForestSim import ForestSim
-
-import numpy as np
-import yaml
-from argparse import Namespace
-import csv
-
-
-map_name = "forest2"
-n = 1
-serial_name = f"Serialforest_{n}"
-repeat_name = f"SerialRepeat"
-
-train_n = 200000
-test_n = 100
-
 
 from LearningLocalPlanning.Simulator.ForestSim import ForestSim
 import yaml   
 from argparse import Namespace
 # from ResultsTest import TestVehicles
 
+import numpy as np
+import csv 
 
 def load_conf(path, fname):
     full_path = path + 'config/' + fname + '.yaml'
@@ -226,9 +210,9 @@ class TestVehicles(TestData):
 
 
 
-def train_vehicle(env, vehicle, steps):
+def train_vehicle(env, vehicle, steps, obstacles=True):
     done = False
-    state = env.reset()
+    state = env.reset(obstacles)
 
     print(f"Starting Training: {vehicle.name}")
     for n in range(steps):
@@ -244,141 +228,13 @@ def train_vehicle(env, vehicle, steps):
             vehicle.done_entry(s_prime)
             # vehicle.show_vehicle_history()
             # env.history.show_history()
-            # env.render(wait=False, name=vehicle.name)
+            env.render(wait=False, name=vehicle.name)
 
             vehicle.reset_lap()
-            state = env.reset()
+            state = env.reset(obstacles)
 
     vehicle.t_his.print_update(True)
     vehicle.t_his.save_csv_data()
 
     print(f"Finished Training: {vehicle.name}")
 
-
-
-
-"""
-Training Functions
-"""
-def train_serial():
-    sim_conf = load_conf("", "std_config")
-    env = ForestSim(map_name, sim_conf)
-    vehicle = SerialVehicleTrain(serial_name, map_name, sim_conf, h_size=200)
-
-    train_vehicle(env, vehicle, train_n)
-
-
-
-"""Test Functions"""
-def test_serial():
-    sim_conf = load_conf("", "std_config")
-    env = ForestSim(map_name, sim_conf)
-    vehicle = SerialVehicleTest(serial_name, map_name, sim_conf)
-
-    test_single_vehicle(env, vehicle, True, test_n, wait=False)
-
-
-
-
-def train_repeatability2():
-    sim_conf = load_conf("", "std_config")
-    env = ForestSim(map_name, sim_conf)
-
-    for i in range(1, 11):
-        train_name = f"SAPRepeat_forest2_{i}"
-
-        vehicle = SerialVehicleTrain(train_name, map_name, sim_conf, load=False)
-
-        train_vehicle(env, vehicle, 20000)
-
-def train_repeatability5():
-    sim_conf = load_conf("", "std_config")
-    env = ForestSim(map_name, sim_conf)
-
-    for i in range(1, 11):
-        train_name = f"SAPRepeat_forest5_{i}"
-
-        vehicle = SerialVehicleTrain(train_name, map_name, sim_conf, load=False)
-
-        train_vehicle(env, vehicle, 50000)
-
-def train_repeatability10():
-    sim_conf = load_conf("", "std_config")
-    env = ForestSim(map_name, sim_conf)
-
-    for i in range(5, 11):
-        train_name = f"SAPRepeat_forest10_{i}"
-
-        vehicle = SerialVehicleTrain(train_name, map_name, sim_conf, load=False)
-
-        train_vehicle(env, vehicle, 100000)
-
-
-def test_repeat():
-    sim_conf = load_conf("", "std_config")
-    env = ForestSim(map_name, sim_conf)
-    test = TestVehicles(sim_conf, repeat_name)
-
-    for i in range(1, 11):
-        train_name = f"SAPRepeat_forest_{i}"
-        vehicle = SerialVehicleTest(train_name, map_name, sim_conf)
-        test.add_vehicle(vehicle)
-
-    # test.run_eval(env, 1000, False)
-    test.run_eval(env, test_n, False)
-
-
-def test_repeat2():
-    sim_conf = load_conf("", "std_config")
-    env = ForestSim(map_name, sim_conf)
-    test = TestVehicles(sim_conf, "Repeat2")
-
-    for i in range(1, 11):
-        train_name = f"SAPRepeat_forest2_{i}"
-        vehicle = SerialVehicleTest(train_name, map_name, sim_conf)
-        test.add_vehicle(vehicle)
-
-    # test.run_eval(env, 1000, False)
-    test.run_eval(env, test_n, False)
-
-
-def test_repeat5():
-    sim_conf = load_conf("", "std_config")
-    env = ForestSim(map_name, sim_conf)
-    test = TestVehicles(sim_conf, "Repeat5")
-
-    for i in range(1, 11):
-        train_name = f"SAPRepeat_forest5_{i}"
-        vehicle = SerialVehicleTest(train_name, map_name, sim_conf)
-        test.add_vehicle(vehicle)
-
-    # test.run_eval(env, 1000, False)
-    test.run_eval(env, test_n, False)
-
-def test_repeat10():
-    sim_conf = load_conf("", "std_config")
-    env = ForestSim(map_name, sim_conf)
-    test = TestVehicles(sim_conf, "Repeat10")
-
-    for i in range(1, 11):
-        train_name = f"SAPRepeat_forest10_{i}"
-        vehicle = SerialVehicleTest(train_name, map_name, sim_conf)
-        test.add_vehicle(vehicle)
-
-    # test.run_eval(env, 1000, False)
-    test.run_eval(env, test_n, False)
-
-
-
-
-if __name__ == "__main__":
-    # train_serial()
-    # test_serial() 
-    # train_repeatability2()
-    # train_repeatability5()
-    # train_repeatability10()
-    # train_repeatability()
-    # test_repeat()
-    # test_repeat2()
-    # test_repeat5()
-    test_repeat10()

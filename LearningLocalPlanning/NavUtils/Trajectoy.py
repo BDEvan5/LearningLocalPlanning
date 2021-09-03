@@ -2,6 +2,7 @@ import numpy as np
 from numba import njit, jit
 import csv 
 from LearningLocalPlanning import LibFunctions as lib
+from LearningLocalPlanning.NavUtils import pure_pursuit_utils
 
 
 class Trajectory:
@@ -11,7 +12,7 @@ class Trajectory:
         self._load_csv_track(map_name)
         self.n_wpts = len(self.waypoints)
 
-        
+        self.max_reacquire = 20
 
     def _load_csv_track(self, map_name):
         track = []
@@ -50,4 +51,21 @@ class Trajectory:
         self.waypoints = np.array(new_line)
         self.vs = np.array(new_vs)
 
+    def _get_current_waypoint(self, position, lookahead_distance):
+        wpts = np.vstack((self.waypoints[:, 0], self.waypoints[:, 1])).T
+        nearest_point, nearest_dist, t, i = pure_pursuit_utils.nearest_point_on_trajectory_py2(position, wpts)
+        if nearest_dist < lookahead_distance:
+            lookahead_point, i2, t2 = pure_pursuit_utils.first_point_on_trajectory_intersecting_circle(position, lookahead_distance, wpts, i+t, wrap=True)
+            if i2 == None:
+                return None
+            current_waypoint = np.empty((3, ))
+            # x, y
+            current_waypoint[0:2] = wpts[i2, :]
+            # speed
+            current_waypoint[2] = self.vs[i]
+            return current_waypoint
+        elif nearest_dist < self.max_reacquire:
+            return np.append(wpts[i, :], self.vs[i])
+        else:
+            return None
 
