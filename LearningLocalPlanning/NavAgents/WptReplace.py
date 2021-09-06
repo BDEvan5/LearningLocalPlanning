@@ -3,7 +3,7 @@ import numpy as np
 from LearningLocalPlanning.NavUtils.Trajectoy import Trajectory
 from LearningLocalPlanning.NavUtils.TD3 import TD3
 from LearningLocalPlanning.NavUtils.HistoryStructs import TrainHistory
-
+from matplotlib import pyplot as plt
 
 
 class WptReplaceBase:
@@ -24,25 +24,31 @@ class WptReplaceBase:
 
     def transform_obs(self, obs):
         state = obs['state']
-        
-        n_pts = 5
-        step_distance = 0.3
-        pts = np.zeros((n_pts, 2)) 
-        pts[0] = self.trajectory._get_current_waypoint(state[0:2], step_distance)[0:2]
-        for i in range(1, n_pts):
-            pts[i] = self.trajectory._get_current_waypoint(pts[i-1], step_distance)[0:2]
-        
-        # make pts relative
-        x_scale = 1
-        y_scale = 1.5 
-        r_pts = pts -  np.ones((n_pts, 2)) * state[0:2]
-        r_pts[:, 0] = r_pts[:, 0] / x_scale 
-        r_pts[:, 1] = r_pts[:, 1] / y_scale
+        scan = obs['scan']
+        scan = np.clip(scan, 0, self.range_finder_scale)
+        scan = scan / self.range_finder_scale
 
         cur_v = [state[3]/self.max_v]
         cur_d = [state[4]/self.max_steer]
 
-        nn_obs = np.concatenate((r_pts.flatten(), cur_v, cur_d))
+        nn_obs = np.concatenate((scan, cur_v, cur_d))
+
+        
+        # n_pts = 5
+        # step_distance = 0.3
+        # pts = np.zeros((n_pts, 2)) 
+        # pts[0] = self.trajectory._get_current_waypoint(state[0:2], step_distance)[0:2]
+        # for i in range(1, n_pts):
+        #     pts[i] = self.trajectory._get_current_waypoint(pts[i-1], step_distance)[0:2]
+        
+        # # make pts relative
+        # x_scale = 1
+        # y_scale = 1.5 
+        # r_pts = pts -  np.ones((n_pts, 2)) * state[0:2]
+        # r_pts[:, 0] = r_pts[:, 0] / x_scale 
+        # r_pts[:, 1] = r_pts[:, 1] / y_scale
+
+        # nn_obs = np.concatenate((r_pts.flatten(), cur_v, cur_d))
 
         return nn_obs 
 
@@ -96,10 +102,20 @@ class WptReplaceTrain(WptReplaceBase):
 
             self.agent.replay_buffer.add(self.nn_obs, self.nn_act, nn_s_prime, reward, False)
 
+            # plt.figure(1)
+            # plt.clf()
+            # plt.xlim([-1, 1])
+            # pts = self.nn_obs[:-2]
+            # pts = np.reshape(pts, (-1, 2))
+            # plt.plot(pts[:, 0], pts[:, 1], '+-', markersize=12)
+            # plt.plot(self.nn_act, 0, 'x', markersize=18)
+            # plt.title(f"Reward: {reward}")
+            # plt.pause(0.0001)
+
+
     def calculate_reward(self, s_prime):
-        # reward = s_prime['target'][1] - self.obs['target'][1]
-        # reward = -np.abs(self.nn_act[0]) /5
-        reward = (1 - np.abs(s_prime['state'][0]-1)) / 10
+        reward = s_prime['target'][1] - self.obs['target'][1]
+        # reward = (0.5 - np.abs(s_prime['state'][0]-1)) / 10
 
         return reward
 
@@ -115,6 +131,6 @@ class WptReplaceTrain(WptReplaceBase):
         if self.t_his.ptr % 10 == 0:
             self.t_his.print_update(True)
             self.agent.save(self.path)
-        self.obs = None
 
         self.agent.replay_buffer.add(self.nn_obs, self.nn_act, nn_s_prime, reward, True)
+        self.nn_act = None

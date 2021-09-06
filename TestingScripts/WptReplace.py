@@ -16,6 +16,7 @@ def train_wpt_replace():
     sim_conf = load_conf("", "std_config")
     env = ForestSim(map_name, sim_conf)
     vehicle = WptReplaceTrain(wpt_rep_name, map_name, sim_conf, h_size=200)
+    
 
     train_vehicle(env, vehicle, train_n, False)
 
