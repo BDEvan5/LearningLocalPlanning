@@ -9,7 +9,7 @@ from LearningLocalPlanning import LibFunctions as lib
 from LearningLocalPlanning.NavUtils.HistoryStructs import TrainHistory
 from LearningLocalPlanning.NavUtils.speed_utils import calculate_speed
 from LearningLocalPlanning.NavUtils import pure_pursuit_utils
-
+from LearningLocalPlanning.NavUtils.RewardFunctions import DistReward
 
 class SerialPP:
     def __init__(self, sim_conf) -> None:
@@ -213,9 +213,10 @@ class SerialVehicleTrain(SerialBase):
         self.nn_state = None
         self.nn_act = None
         self.action = None
-        self.reward_function = self.calculate_reward
 
         self.t_his = TrainHistory(agent_name, load)
+
+        self.calculate_reward = DistReward() 
 
     def plan_act(self, obs):
         pp_action = super().act_pp(obs['state'])
@@ -236,17 +237,11 @@ class SerialVehicleTrain(SerialBase):
 
     def add_memory_entry(self, s_prime, nn_s_prime):
         if self.state is not None:
-            reward = self.calculate_reward(s_prime)
-            # reward = self.reward_function(self.state, s_prime)
+            reward = self.calculate_reward(self.state, s_prime)
 
             self.t_his.add_step_data(reward)
 
             self.agent.replay_buffer.add(self.nn_state, self.nn_act, nn_s_prime, reward, False)
-
-    def calculate_reward(self, s_prime):        
-        reward = s_prime['target'][1] - self.state['target'][1]
-
-        return reward
 
     def done_entry(self, s_prime):
         """
@@ -254,9 +249,8 @@ class SerialVehicleTrain(SerialBase):
         """
         pp_action = super().act_pp(s_prime['state'])
         nn_s_prime = self.transform_obs(s_prime, pp_action)
-        # reward = s_prime['reward'] + self.reward_function(self.state, s_prime)
-        reward = s_prime['reward'] + self.calculate_reward(s_prime)
-        # reward = s_prime['reward'] + self.calculate_reward(s_prime)
+        reward = self.calculate_reward(self.state, s_prime)
+
 
         self.t_his.add_step_data(reward)
         self.t_his.lap_done(False)

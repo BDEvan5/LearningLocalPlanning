@@ -3,10 +3,10 @@ import numpy as np
 from numba import njit
 
 import torch
-from LearningLocalPlanning.NavUtils.TD3 import TD3, Actor
+from LearningLocalPlanning.NavUtils.TD3 import TD3
 from LearningLocalPlanning.NavUtils.HistoryStructs import TrainHistory
 from LearningLocalPlanning.NavUtils.speed_utils import calculate_speed
-
+from LearningLocalPlanning.NavUtils.RewardFunctions import DistReward
 
 
 class BaseNav:
@@ -52,6 +52,8 @@ class NavTrainVehicle(BaseNav):
         self.nn_state = None
         self.nn_action = None
 
+        self.calculate_reward = DistReward()
+
     def plan_act(self, obs):
         nn_obs = self.transform_obs(obs)
         self.add_memory_entry(obs, nn_obs)
@@ -68,16 +70,9 @@ class NavTrainVehicle(BaseNav):
 
         return self.action
 
-    def calcualte_reward(self, s_prime):
-        reward = s_prime['target'][1] - self.state['target'][1]
-        # reward = (s_prime[6] - self.state[6]) 
-        reward += s_prime['reward']
-        
-        return reward
-
     def add_memory_entry(self, s_prime, nn_s_prime):
         if self.state is not None:
-            reward = self.calcualte_reward(s_prime)
+            reward = self.calculate_reward(self.state, s_prime)
 
             self.t_his.add_step_data(reward)
             # mem_entry = (self.nn_state, self.nn_action, nn_s_prime, reward, False)
@@ -85,7 +80,8 @@ class NavTrainVehicle(BaseNav):
             self.agent.replay_buffer.add(self.nn_state, self.nn_action, nn_s_prime, reward, False)
 
     def done_entry(self, s_prime):
-        reward = self.calcualte_reward(s_prime)
+        reward = self.calculate_reward(self.state, s_prime)
+
         nn_s_prime = self.transform_obs(s_prime)
         if self.t_his.ptr % 10 == 0 or True:
             self.t_his.print_update()

@@ -10,7 +10,7 @@ from LearningLocalPlanning import LibFunctions as lib
 from LearningLocalPlanning.NavUtils.HistoryStructs import TrainHistory
 from LearningLocalPlanning.NavUtils.speed_utils import calculate_speed
 from LearningLocalPlanning.NavUtils import pure_pursuit_utils
-
+from LearningLocalPlanning.NavUtils.RewardFunctions import DistReward
 
 class ModPP:
     def __init__(self, sim_conf) -> None:
@@ -216,6 +216,7 @@ class ModVehicleTrain(BaseMod):
         self.action = None
 
         self.t_his = TrainHistory(agent_name, load)
+        self.calculate_reward = DistReward()
 
     def set_reward_fcn(self, r_fcn):
         self.reward_fcn = r_fcn
@@ -242,7 +243,8 @@ class ModVehicleTrain(BaseMod):
 
     def add_memory_entry(self, s_prime, nn_s_prime):
         if self.state is not None:
-            reward = self.calculate_reward(s_prime)
+            reward = self.calculate_reward(self.state, s_prime)
+
 
             self.t_his.add_step_data(reward)
 
@@ -251,22 +253,13 @@ class ModVehicleTrain(BaseMod):
 
             self.agent.replay_buffer.add(self.nn_state, self.nn_act, nn_s_prime, reward, False)
 
-    def calculate_reward(self, s_prime):
-        # reward = (self.state[6] - s_prime[6]) 
-        # reward = (s_prime[6] - self.state[6]) 
-        # reward = 0.02 * (1-abs(s_prime[4])) # minimise steering
-        
-        reward = s_prime['target'][1] - self.state['target'][1]
-
-        return reward
-
     def done_entry(self, s_prime):
         """
         To be called when ep is done.
         """
         pp_action = super().act_pp(s_prime['state'])
         nn_s_prime = self.transform_obs(s_prime, pp_action)
-        reward = s_prime['reward'] + self.calculate_reward(s_prime)
+        reward = self.calculate_reward(self.state, s_prime)
 
         self.t_his.add_step_data(reward)
         self.t_his.lap_done(False)
