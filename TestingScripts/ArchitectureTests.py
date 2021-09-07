@@ -22,7 +22,7 @@ sap_name = f"SapForest_{train_n}"
 
 comparison_name = f"ArchComparison_{train_n}"
 
-test_n = 10
+test_n = 100
 
 
 
@@ -91,7 +91,7 @@ def test_repeat(VehicleClass, base_name):
 if __name__ == "__main__":
     # test_follow_the_gap()
     # test_oracle()
-    # test_planner(ModVehicleTest, mod_name)
+    test_planner(ModVehicleTest, mod_name)
     # test_planner(NavTestVehicle, nav_name)
     # test_planner(SerialVehicleTest, sap_name)
 
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     # test_repeat(ModVehicleTest, "RepeatMod_forest")
     # test_repeat(SerialVehicleTest, "RepeatSap_forest")
 
-    comparison_test()
+    # comparison_test()
 
 
 

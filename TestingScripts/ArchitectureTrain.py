@@ -16,8 +16,8 @@ nav_name = f"Navforest_{n}"
 mod_name = f"ModForest_{n}"
 sap_name = f"SapForest_{n}"
 
-# train_n = 200000
-train_n = 200
+train_n = 200000
+# train_n = 200
 
 
 """
@@ -48,9 +48,9 @@ def train_repeatability(VehicleClass, base_name: str):
 
 if __name__ == "__main__":
 
-    train_planner(NavTrainVehicle, nav_name)
     train_planner(ModVehicleTrain, mod_name)
     train_planner(SerialVehicleTrain, sap_name)
+    train_planner(NavTrainVehicle, nav_name)
 
     # train_repeatability(ModVehicleTrain, "RepeatMod_forest")
     # train_repeatability(NavTrainVehicle, "RepeatNav_forest")

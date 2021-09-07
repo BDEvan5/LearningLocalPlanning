@@ -228,7 +228,7 @@ def train_vehicle(env, vehicle, steps, obstacles=True):
             vehicle.done_entry(s_prime)
             # vehicle.show_vehicle_history()
             # env.history.show_history()
-            env.render(wait=False, name=vehicle.name)
+            # env.render(wait=False, name=vehicle.name)
 
             vehicle.reset_lap()
             state = env.reset(obstacles)
