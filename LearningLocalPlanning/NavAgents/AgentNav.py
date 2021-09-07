@@ -2,7 +2,8 @@ from os import name
 import numpy as np 
 from numba import njit
 
-from LearningLocalPlanning.NavUtils.TD3 import TD3
+import torch
+from LearningLocalPlanning.NavUtils.TD3 import TD3, Actor
 from LearningLocalPlanning.NavUtils.HistoryStructs import TrainHistory
 from LearningLocalPlanning.NavUtils.speed_utils import calculate_speed
 
@@ -103,18 +104,17 @@ class NavTrainVehicle(BaseNav):
 
 
 class NavTestVehicle(BaseNav):
-    def __init__(self, agent_name, sim_conf) -> None:
+    def __init__(self, agent_name, map_name, sim_conf) -> None:
         BaseNav.__init__(self, agent_name, sim_conf)
         self.path = 'Vehicles/' + agent_name
-        state_space = 2 + self.n_beams
-        self.agent = TD3(state_space, 1, 1, agent_name)
-        h_size = 200
-        self.agent.try_load(True, h_size, self.path)
+        self.actor = torch.load(self.path + '/' + agent_name + "_actor.pth")
+        
         self.n_beams = 10
 
     def plan_act(self, obs):
         nn_obs = self.transform_obs(obs)
-        nn_action = self.agent.act(nn_obs)
+        nn_obs = torch.FloatTensor(nn_obs.reshape(1, -1))
+        nn_action = self.actor(nn_obs).data.numpy().flatten()
         steering_angle = self.max_steer * nn_action[0]
 
         speed = calculate_speed(steering_angle)

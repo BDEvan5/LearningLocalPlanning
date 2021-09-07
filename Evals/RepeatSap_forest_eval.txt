@@ -1,0 +1,65 @@
+
+Testing Complete 
+Map name:  
+-----------------------------------------------------
+-----------------------------------------------------
+Vehicle: RepeatSap_forest_0
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 148.0
+-----------------------------------------------------
+Vehicle: RepeatSap_forest_1
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 158.0
+-----------------------------------------------------
+Vehicle: RepeatSap_forest_2
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 158.0
+-----------------------------------------------------
+Vehicle: RepeatSap_forest_3
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 158.0
+-----------------------------------------------------
+Vehicle: RepeatSap_forest_4
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 158.0
+-----------------------------------------------------
+Vehicle: RepeatSap_forest_5
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 150.0
+-----------------------------------------------------
+Vehicle: RepeatSap_forest_6
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 132.0
+-----------------------------------------------------
+Vehicle: RepeatSap_forest_7
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 158.0
+-----------------------------------------------------
+Vehicle: RepeatSap_forest_8
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 158.0
+-----------------------------------------------------
+Vehicle: RepeatSap_forest_9
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 158.0
+-----------------------------------------------------

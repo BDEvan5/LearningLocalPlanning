@@ -1,0 +1,65 @@
+
+Testing Complete 
+Map name:  
+-----------------------------------------------------
+-----------------------------------------------------
+Vehicle: RepeatMod_forest_0
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 109.0
+-----------------------------------------------------
+Vehicle: RepeatMod_forest_1
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 109.0
+-----------------------------------------------------
+Vehicle: RepeatMod_forest_2
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 109.0
+-----------------------------------------------------
+Vehicle: RepeatMod_forest_3
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 109.0
+-----------------------------------------------------
+Vehicle: RepeatMod_forest_4
+Crashes: 9.0 --> Completes 1.0
+% Finished = 10.00
+Avg lap times: 410.0
+No Obs Time: 142.0
+-----------------------------------------------------
+Vehicle: RepeatMod_forest_5
+Crashes: 7.0 --> Completes 3.0
+% Finished = 30.00
+Avg lap times: 1244.0
+No Obs Time: 954.0
+-----------------------------------------------------
+Vehicle: RepeatMod_forest_6
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 110.0
+-----------------------------------------------------
+Vehicle: RepeatMod_forest_7
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 109.0
+-----------------------------------------------------
+Vehicle: RepeatMod_forest_8
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 109.0
+-----------------------------------------------------
+Vehicle: RepeatMod_forest_9
+Crashes: 10.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 109.0
+-----------------------------------------------------

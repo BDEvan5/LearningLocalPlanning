@@ -235,6 +235,7 @@ def train_vehicle(env, vehicle, steps, obstacles=True):
 
     vehicle.t_his.print_update(True)
     vehicle.t_his.save_csv_data()
+    vehicle.agent.save(vehicle.path)
 
     print(f"Finished Training: {vehicle.name}")
 
