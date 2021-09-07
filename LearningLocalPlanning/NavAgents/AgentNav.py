@@ -37,7 +37,7 @@ class BaseNav:
     
 
 class NavTrainVehicle(BaseNav):
-    def __init__(self, agent_name, sim_conf, load=False, h_size=200) -> None:
+    def __init__(self, agent_name, map_name, sim_conf, load=False, h_size=200) -> None:
         BaseNav.__init__(self, agent_name, sim_conf)
         self.path = 'Vehicles/' + agent_name
         state_space = 3 + self.n_beams
