@@ -3,13 +3,14 @@ from numba.core.decorators import njit
 import numpy as np 
 import csv
 from matplotlib import pyplot as plt
+import torch
 
 from LearningLocalPlanning.NavUtils.TD3 import TD3
 from LearningLocalPlanning import LibFunctions as lib
 from LearningLocalPlanning.NavUtils.HistoryStructs import TrainHistory
 from LearningLocalPlanning.NavUtils.speed_utils import calculate_speed
 from LearningLocalPlanning.NavUtils import pure_pursuit_utils
-
+from LearningLocalPlanning.NavUtils.RewardFunctions import DistReward
 
 class ModPP:
     def __init__(self, sim_conf) -> None:
@@ -215,6 +216,7 @@ class ModVehicleTrain(BaseMod):
         self.action = None
 
         self.t_his = TrainHistory(agent_name, load)
+        self.calculate_reward = DistReward()
 
     def set_reward_fcn(self, r_fcn):
         self.reward_fcn = r_fcn
@@ -241,7 +243,8 @@ class ModVehicleTrain(BaseMod):
 
     def add_memory_entry(self, s_prime, nn_s_prime):
         if self.state is not None:
-            reward = self.calculate_reward(s_prime)
+            reward = self.calculate_reward(self.state, s_prime)
+
 
             self.t_his.add_step_data(reward)
 
@@ -250,27 +253,18 @@ class ModVehicleTrain(BaseMod):
 
             self.agent.replay_buffer.add(self.nn_state, self.nn_act, nn_s_prime, reward, False)
 
-    def calculate_reward(self, s_prime):
-        # reward = (self.state[6] - s_prime[6]) 
-        # reward = (s_prime[6] - self.state[6]) 
-        # reward = 0.02 * (1-abs(s_prime[4])) # minimise steering
-        
-        reward = s_prime['target'][1] - self.state['target'][1]
-
-        return reward
-
     def done_entry(self, s_prime):
         """
         To be called when ep is done.
         """
         pp_action = super().act_pp(s_prime['state'])
         nn_s_prime = self.transform_obs(s_prime, pp_action)
-        reward = s_prime['reward'] + self.calculate_reward(s_prime)
+        reward = self.calculate_reward(self.state, s_prime)
 
         self.t_his.add_step_data(reward)
         self.t_his.lap_done(False)
         if self.t_his.ptr % 10 == 0:
-            self.t_his.print_update(True)
+            self.t_his.print_update(False)
             self.agent.save(self.path)
         self.state = None
 
@@ -291,32 +285,26 @@ class ModVehicleTest(BaseMod):
         BaseMod.__init__(self, agent_name, map_name, sim_conf)
 
         self.path = 'Vehicles/' + agent_name
-        state_space = 4 + self.n_beams
-        self.agent = TD3(state_space, 1, 1, agent_name)
-        self.agent.load(directory=self.path)
+
+        self.actor = torch.load(self.path + '/' + agent_name + "_actor.pth")
         self.n_beams = 10
 
         print(f"Agent loaded: {agent_name}")
 
-        # self.vis = LidarVizMod(10)
 
     def plan_act(self, obs):
         pp_action = super().act_pp(obs['state'])
         nn_obs = self.transform_obs(obs, pp_action)
 
-        nn_action = self.agent.act(nn_obs, noise=0)
-        # nn_action = [0]
+        nn_obs = torch.FloatTensor(nn_obs.reshape(1, -1))
+        nn_action = self.actor(nn_obs).data.numpy().flatten()
         self.nn_act = nn_action
 
-        critic_val = self.agent.get_critic_value(nn_obs, nn_action)
-        self.history.add_step(pp_action[0], nn_action[0]*self.max_steer, critic_val)
+        # critic_val = self.agent.get_critic_value(nn_obs, nn_action)
+        # self.history.add_step(pp_action[0], nn_action[0]*self.max_steer, critic_val)
 
         steering_angle = self.modify_references(self.nn_act, pp_action[0])
-        # speed = 4
         speed = calculate_speed(steering_angle)
         action = np.array([steering_angle, speed])
-
-        # pp = pp_action[0]/self.max_steer
-        # self.vis.add_step(nn_obs[4:], pp, nn_action)
 
         return action

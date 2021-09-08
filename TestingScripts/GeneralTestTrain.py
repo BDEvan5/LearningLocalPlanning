@@ -1,26 +1,11 @@
 
-
-from LearningLocalPlanning.NavAgents.AgentNav import NavTestVehicle
-from LearningLocalPlanning.NavAgents.AgentMod import ModVehicleTest 
-from LearningLocalPlanning.NavAgents.Oracle import Oracle
-from LearningLocalPlanning.NavAgents.FollowTheGap import ForestFGM
-
 from LearningLocalPlanning.Simulator.ForestSim import ForestSim
-
-import numpy as np 
-import csv, yaml 
+import yaml   
 from argparse import Namespace
+# from ResultsTest import TestVehicles
 
-
-map_name = "forest2"
-n = 1
-nav_name = f"Navforest_{n}"
-mod_name = f"ModForest_{n}"
-repeat_name = f"RepeatTest_{n}"
-eval_name = f"CompareTest_{n}"
-
-n_test = 100
-
+import numpy as np
+import csv 
 
 def load_conf(path, fname):
     full_path = path + 'config/' + fname + '.yaml'
@@ -31,6 +16,50 @@ def load_conf(path, fname):
 
     return conf
 
+
+
+"""General test function"""
+def test_single_vehicle(env, vehicle, show=False, laps=100, add_obs=True, wait=False, vis=False):
+    crashes = 0
+    completes = 0
+    lap_times = [] 
+
+    state = env.reset(add_obs)
+    done, score = False, 0.0
+    for i in range(laps):
+        try:
+            vehicle.plan_forest(env.env_map)
+        except AttributeError as e:
+            pass
+        while not done:
+            a = vehicle.plan_act(state)
+            s_p, r, done, _ = env.step_plan(a)
+            state = s_p
+            # env.render(False)
+        if show:
+            # env.history.show_history()
+            # vehicle.history.save_nn_output()
+            env.render(wait=False, name=vehicle.name)
+            if wait:
+                env.render(wait=True)
+
+        if r == -1:
+            crashes += 1
+            print(f"({i}) Crashed -> time: {env.steps} ")
+        else:
+            completes += 1
+            print(f"({i}) Complete -> time: {env.steps}")
+            lap_times.append(env.steps)
+        if vis:
+            vehicle.vis.play_visulisation()
+        state = env.reset(add_obs)
+        
+        vehicle.reset_lap()
+        done = False
+
+    print(f"Crashes: {crashes}")
+    print(f"Completes: {completes} --> {(completes / (completes + crashes) * 100):.2f} %")
+    print(f"Lap times Avg: {np.mean(lap_times)} --> Std: {np.std(lap_times)}")
 
 
 
@@ -181,48 +210,44 @@ class TestVehicles(TestData):
 
 
 
+def train_vehicle(env, vehicle, steps, obstacles=True, n_buffer=1000):
+    done = False
+    state = env.reset(obstacles)
 
-def big_test():
-    sim_conf = load_conf("", "std_config")
-    env = ForestSim(map_name, sim_conf)
-    test = TestVehicles(sim_conf, eval_name)
+    print(f"Building Buffer: {n_buffer}")
+    for n in range(n_buffer):
+        a = vehicle.plan_act(state)
+        s_prime, r, done, _ = env.step_plan(a)
+        state = s_prime
+        
+        if done:
+            vehicle.done_entry(s_prime)
 
-    vehicle = NavTestVehicle(nav_name, sim_conf)
-    test.add_vehicle(vehicle)
+            vehicle.reset_lap()
+            state = env.reset(obstacles)
 
-    vehicle = ForestFGM()
-    test.add_vehicle(vehicle)
+    print(f"Starting Training: {vehicle.name}")
+    for n in range(steps):
+        a = vehicle.plan_act(state)
+        s_prime, r, done, _ = env.step_plan(a)
 
-    vehicle = Oracle(sim_conf)
-    test.add_vehicle(vehicle)
+        state = s_prime
+        vehicle.agent.train(2)
+        
+        # env.render(False)
+        
+        if done:
+            vehicle.done_entry(s_prime)
+            # vehicle.show_vehicle_history()
+            # env.history.show_history()
+            # env.render(wait=False, name=vehicle.name)
 
-    vehicle = ModVehicleTest(mod_name, map_name, sim_conf)
-    test.add_vehicle(vehicle)
+            vehicle.reset_lap()
+            state = env.reset(obstacles)
 
-    # test.run_eval(env, 1, True)
-    test.run_eval(env, n_test, False, wait=False)
+    vehicle.t_his.print_update(True)
+    vehicle.t_his.save_csv_data()
+    vehicle.agent.save(vehicle.path)
 
-
-
-def test_repeat():
-    sim_conf = load_conf("", "std_config")
-    env = ForestSim(map_name, sim_conf)
-    test = TestVehicles(sim_conf, repeat_name)
-
-    for i in range(10):
-        train_name = f"ModRepeat_forest_{i}"
-        vehicle = ModVehicleTest(train_name, map_name, sim_conf)
-        test.add_vehicle(vehicle)
-
-    # test.run_eval(env, 1000, False)
-    test.run_eval(env, n_test, False)
-
-
-
-if __name__ == "__main__":
-    
-
-    big_test()
-    test_repeat()
-
+    print(f"Finished Training: {vehicle.name}")
 

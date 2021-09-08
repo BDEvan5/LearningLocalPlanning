@@ -4,17 +4,7 @@ class DistReward:
     # @staticmethod
     def __call__(self, state, s_prime):        
         reward = s_prime['target'][1] - state['target'][1]
-
-        return reward
-
-class SafeReward:
-    # @staticmethod
-    def __call__(self, state, s_prime):        
-        reward = s_prime['target'][1] - state['target'][1]
-        if min(s_prime['scan']) < 0.1:
-            reward -= 0.2 
-        if min(s_prime['scan'][4:7]) < 0.2:
-            reward -= 0.2
+        reward += s_prime['reward']
 
         return reward
 
@@ -30,6 +20,17 @@ class CthReward:
         reward_h = np.cos(s_prime['state'][2]) * self.b_h
 
         reward = reward_h - reward_ct
+        reward += s_prime['reward']
+
+        return reward
+
+class SteeringReward:
+    def __init__(self, b_s):
+        self.b_s = b_s
+        
+    def __call__(self, state, s_prime):
+        reward = - abs(s_prime['state'][4])**0.5 * self.b_s
+        reward += s_prime['reward']
 
         return reward
 

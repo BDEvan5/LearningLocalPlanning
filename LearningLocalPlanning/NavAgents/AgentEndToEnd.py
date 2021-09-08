@@ -11,65 +11,6 @@ from LearningLocalPlanning.NavUtils.speed_utils import calculate_speed
 from LearningLocalPlanning.NavUtils import pure_pursuit_utils
 from LearningLocalPlanning.NavUtils.RewardFunctions import DistReward
 
-class SerialPP:
-    def __init__(self, sim_conf) -> None:
-        self.path_name = None
-
-        self.wheelbase = sim_conf.l_f + sim_conf.l_r
-        self.max_steer = sim_conf.max_steer
-
-        self.v_gain = 0.5
-        self.lookahead = 0.8
-        self.max_reacquire = 20
-
-        self.waypoints = None
-        self.vs = None
-
-        self.aim_pts = []
-
-    def _get_current_waypoint(self, position):
-        lookahead_distance = self.lookahead
-    
-        wpts = np.vstack((self.waypoints[:, 0], self.waypoints[:, 1])).T
-        nearest_point, nearest_dist, t, i = pure_pursuit_utils.nearest_point_on_trajectory_py2(position, wpts)
-        if nearest_dist < lookahead_distance:
-            lookahead_point, i2, t2 = pure_pursuit_utils.first_point_on_trajectory_intersecting_circle(position, lookahead_distance, wpts, i+t, wrap=True)
-            if i2 == None:
-                return None
-            current_waypoint = np.empty((3, ))
-            # x, y
-            current_waypoint[0:2] = wpts[i2, :]
-            # speed
-            current_waypoint[2] = self.vs[i]
-            return current_waypoint
-        elif nearest_dist < self.max_reacquire:
-            return np.append(wpts[i, :], self.vs[i])
-        else:
-            return None
-
-    def act_pp(self, obs):
-        pose_th = obs[2]
-        pos = np.array(obs[0:2], dtype=np.float)
-
-        lookahead_point = self._get_current_waypoint(pos)
-
-        self.aim_pts.append(lookahead_point[0:2])
-
-        if lookahead_point is None:
-            return [0, 4.0]
-
-        speed, steering_angle = pure_pursuit_utils.get_actuation(pose_th, lookahead_point, pos, self.lookahead, self.wheelbase)
-        steering_angle = np.clip(steering_angle, -self.max_steer, self.max_steer)
-
-        # speed = 4
-        speed = calculate_speed(steering_angle)
-
-        return [steering_angle, speed]
-
-    def reset_lap(self):
-        self.aim_pts.clear()
-
-
 class ModHistory:
     def __init__(self) -> None:
         self.mod_history = []
@@ -96,9 +37,8 @@ class ModHistory:
         self.critic_history.clear()
 
 
-class SerialBase(SerialPP):
+class EndBase:
     def __init__(self, agent_name, map_name, sim_conf) -> None:
-        super().__init__(sim_conf)
         self.name = agent_name
         self.n_beams = sim_conf.n_beams
         self.max_v = sim_conf.max_v
@@ -111,7 +51,7 @@ class SerialBase(SerialPP):
 
         self._load_csv_track(map_name)
 
-    def transform_obs(self, obs, pp_action):
+    def transform_obs(self, obs):
         """
         Transforms the observation received from the environment into a vector which can be used with a neural network.
     
@@ -129,14 +69,12 @@ class SerialBase(SerialPP):
         cur_v = [state[3]/self.max_v]
         cur_d = [state[4]/self.max_steer]
         target_angle = [target[0]/self.max_steer]
-        dr_scale = [pp_action[0]/self.max_steer]
 
         nn_obs = np.concatenate([cur_v, cur_d, target_angle, scan])
-        # nn_obs = np.concatenate([cur_v, cur_d, target_angle, dr_scale, scan])
 
         return nn_obs
 
-    def modify_references(self, nn_action, d_ref):
+    def modify_references(self, nn_action):
         """
         Modifies the reference quantities for the steering.
         Mutliplies the nn_action with the max steering and then sums with the reference
@@ -189,8 +127,10 @@ class SerialBase(SerialPP):
         self.waypoints = np.array(new_line)
         self.vs = np.array(new_vs)
 
+    def reset_lap(self):
+        pass
 
-class SerialVehicleTrain(SerialBase):
+class EndVehicleTrain(EndBase):
     def __init__(self, agent_name, map_name, sim_conf, load=False, h_size=200):
         """
         Training vehicle using the reference modification navigation stack
@@ -202,7 +142,7 @@ class SerialVehicleTrain(SerialBase):
             load: if the network should be loaded or recreated.
         """
 
-        SerialBase.__init__(self, agent_name, map_name, sim_conf)
+        EndBase.__init__(self, agent_name, map_name, sim_conf)
 
         self.path = 'Vehicles/' + agent_name
         state_space = 3 + self.n_beams
@@ -220,8 +160,7 @@ class SerialVehicleTrain(SerialBase):
         self.calculate_reward = DistReward() 
 
     def plan_act(self, obs):
-        pp_action = super().act_pp(obs['state'])
-        nn_obs = self.transform_obs(obs, pp_action)
+        nn_obs = self.transform_obs(obs)
         self.add_memory_entry(obs, nn_obs)
 
         self.state = obs
@@ -230,7 +169,7 @@ class SerialVehicleTrain(SerialBase):
 
         self.nn_state = nn_obs
 
-        steering_angle = self.modify_references(self.nn_act, pp_action[0])
+        steering_angle = self.modify_references(self.nn_act)
         speed = calculate_speed(steering_angle)
         self.action = np.array([steering_angle, speed])
 
@@ -248,8 +187,7 @@ class SerialVehicleTrain(SerialBase):
         """
         To be called when ep is done.
         """
-        pp_action = super().act_pp(s_prime['state'])
-        nn_s_prime = self.transform_obs(s_prime, pp_action)
+        nn_s_prime = self.transform_obs(s_prime)
         reward = self.calculate_reward(self.state, s_prime)
 
 
@@ -263,7 +201,7 @@ class SerialVehicleTrain(SerialBase):
         self.agent.replay_buffer.add(self.nn_state, self.nn_act, nn_s_prime, reward, True)
 
 
-class SerialVehicleTest(SerialBase):
+class EndVehicleTest(EndBase):
     def __init__(self, agent_name, map_name, sim_conf):
         """
         Testing vehicle using the reference modification navigation stack
@@ -274,7 +212,7 @@ class SerialVehicleTest(SerialBase):
             mod_conf: namespace with modification planner parameters
         """
 
-        SerialBase.__init__(self, agent_name, map_name, sim_conf)
+        EndBase.__init__(self, agent_name, map_name, sim_conf)
 
         self.path = 'Vehicles/' + agent_name
         self.actor = torch.load(self.path + '/' + agent_name + "_actor.pth")
@@ -283,8 +221,7 @@ class SerialVehicleTest(SerialBase):
         print(f"Agent loaded: {agent_name}")
 
     def plan_act(self, obs):
-        pp_action = super().act_pp(obs['state'])
-        nn_obs = self.transform_obs(obs, pp_action)
+        nn_obs = self.transform_obs(obs)
 
         nn_obs = torch.FloatTensor(nn_obs.reshape(1, -1))
         nn_action = self.actor(nn_obs).data.numpy().flatten()
@@ -293,7 +230,7 @@ class SerialVehicleTest(SerialBase):
         # critic_val = self.agent.get_critic_value(nn_obs, nn_action)
         # self.history.add_step(pp_action[0], nn_action[0]*self.max_steer, critic_val)
 
-        steering_angle = self.modify_references(self.nn_act, pp_action[0])
+        steering_angle = self.modify_references(self.nn_act)
         speed = calculate_speed(steering_angle)
         action = np.array([steering_angle, speed])
 
