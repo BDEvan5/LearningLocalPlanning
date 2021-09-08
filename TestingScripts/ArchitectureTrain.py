@@ -3,6 +3,7 @@
 from LearningLocalPlanning.NavAgents.AgentNav import NavTrainVehicle
 from LearningLocalPlanning.NavAgents.AgentMod import ModVehicleTrain
 from LearningLocalPlanning.NavAgents.SerialAgentPlanner import SerialVehicleTrain
+from LearningLocalPlanning.NavAgents.AgentEndToEnd import EndVehicleTrain
 from LearningLocalPlanning.Simulator.ForestSim import ForestSim
 import yaml   
 from argparse import Namespace
@@ -11,10 +12,11 @@ from GeneralTestTrain import train_vehicle, load_conf
 
 
 map_name = "forest2"
-n = 2
+n = "test"
 nav_name = f"Navforest_{n}"
 mod_name = f"ModForest_{n}"
 sap_name = f"SapForest_{n}"
+end_name = f"EndForest_{n}"
 
 train_n = 20000
 # train_n = 200
@@ -50,8 +52,9 @@ if __name__ == "__main__":
 
     # train_planner(ModVehicleTrain, mod_name)
     # train_planner(SerialVehicleTrain, sap_name)
+    train_planner(EndVehicleTrain, end_name)
     # train_planner(NavTrainVehicle, nav_name)
 
     # train_repeatability(ModVehicleTrain, "RepeatMod_forest")
     # train_repeatability(NavTrainVehicle, "RepeatNav_forest")
-    train_repeatability(SerialVehicleTrain, "RepeatSap_forest")
+    # train_repeatability(SerialVehicleTrain, "RepeatSap_forest")

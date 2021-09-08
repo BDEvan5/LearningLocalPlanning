@@ -2,6 +2,7 @@
 from LearningLocalPlanning.NavAgents.AgentNav import NavTestVehicle
 from LearningLocalPlanning.NavAgents.AgentMod import ModVehicleTest 
 from LearningLocalPlanning.NavAgents.SerialAgentPlanner import SerialVehicleTest
+from LearningLocalPlanning.NavAgents.AgentEndToEnd import EndVehicleTest
 from LearningLocalPlanning.NavAgents.Oracle import Oracle
 from LearningLocalPlanning.NavAgents.FollowTheGap import ForestFGM
 
@@ -15,10 +16,12 @@ from GeneralTestTrain import test_single_vehicle, load_conf, TestVehicles
 
 
 map_name = "forest2"
-train_n = 1
+# train_n = 1
+train_n = "test"
 nav_name = f"Navforest_{train_n}"
 mod_name = f"ModForest_{train_n}"
 sap_name = f"SapForest_{train_n}"
+end_name = f"EndForest_{train_n}"
 
 comparison_name = f"ArchComparison_{train_n}"
 
@@ -93,7 +96,8 @@ if __name__ == "__main__":
     # test_oracle()
     # test_planner(ModVehicleTest, mod_name)
     # test_planner(NavTestVehicle, nav_name)
-    test_planner(SerialVehicleTest, sap_name)
+    # test_planner(SerialVehicleTest, sap_name)
+    test_planner(EndVehicleTest, end_name)
 
     # test_repeat(NavTestVehicle, "RepeatNav_forest")
     # test_repeat(ModVehicleTest, "RepeatMod_forest")
