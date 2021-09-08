@@ -1,0 +1,23 @@
+
+Testing Complete 
+Map name:  
+-----------------------------------------------------
+-----------------------------------------------------
+Vehicle: SapForestDist_1
+Crashes: 4.0 --> Completes 96.0
+% Finished = 96.00
+Avg lap times: 418.5208333333333
+No Obs Time: 373.0
+-----------------------------------------------------
+Vehicle: SapForestVel_1
+Crashes: 5.0 --> Completes 95.0
+% Finished = 95.00
+Avg lap times: 927.8210526315789
+No Obs Time: 883.0
+-----------------------------------------------------
+Vehicle: SapForestSteer_1
+Crashes: 10.0 --> Completes 90.0
+% Finished = 90.00
+Avg lap times: 575.5888888888888
+No Obs Time: 520.0
+-----------------------------------------------------
