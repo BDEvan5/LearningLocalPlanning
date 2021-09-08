@@ -4,6 +4,7 @@ import csv
 import numpy as np
 from matplotlib import pyplot as plt
 
+SIZE = 20000
 
 class TrainHistory():
     def __init__(self, agent_name, load=False) -> None:
@@ -12,8 +13,8 @@ class TrainHistory():
 
         # training data
         self.ptr = 0
-        self.lengths = np.zeros(10000)
-        self.rewards = np.zeros(10000) 
+        self.lengths = np.zeros(SIZE)
+        self.rewards = np.zeros(SIZE) 
         self.t_counter = 0 # total steps
         
         # espisode data
@@ -59,11 +60,13 @@ class TrainHistory():
 
 
     def print_update(self, plot_reward=True):
-        if self.ptr < 5:
+        if self.ptr < 100:
             return
-        mean = np.mean(self.rewards[0:self.ptr])
-        score = self.rewards[-1]
-        print(f"Run: {self.t_counter} --> Score: {score:.2f} --> Mean: {mean:.2f}  ")
+        
+        mean10 = np.mean(self.rewards[self.ptr-10:self.ptr])
+        mean100 = np.mean(self.rewards[self.ptr-100:self.ptr])
+        # score = moving_average(self.rewards[self.ptr-100:self.ptr], 10)
+        print(f"Run: {self.t_counter} --> Moving10: {mean10:.2f} --> Moving100: {mean100:.2f}  ")
         
         if plot_reward:
             lib.plot(self.rewards[0:self.ptr], figure_n=2)
@@ -80,6 +83,8 @@ class TrainHistory():
         plt.figure(2)
         plt.savefig('Vehicles/' + self.agent_name + "/training_rewards.png")
 
+def moving_average(data, period):
+    return np.convolve(data, np.ones(period), 'same') / period
 
 class RewardAnalyser:
     def __init__(self) -> None:

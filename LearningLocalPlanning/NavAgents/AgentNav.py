@@ -26,12 +26,14 @@ class BaseNav:
         scan = obs['scan'] / self.range_finder_scale
         target = obs['target']
 
-        cur_v = [state[3]/self.max_v]
-        cur_d = [state[4]/self.max_steer]
-        target_angle = [target[0]/max_angle]
+        # cur_v = [state[3]/self.max_v]
+        # cur_d = [state[4]/self.max_steer]
+        # target_angle = [target[0]/max_angle]
         # target_distance = [target[1]/self.distance_scale]
 
-        nn_obs = np.concatenate([cur_v, cur_d, target_angle, scan])
+        # nn_obs = np.concatenate([cur_v, cur_d, target_angle, scan])
+
+        nn_obs = scan
 
         return nn_obs
 
@@ -41,7 +43,7 @@ class NavTrainVehicle(BaseNav):
     def __init__(self, agent_name, map_name, sim_conf, load=False, h_size=200) -> None:
         BaseNav.__init__(self, agent_name, sim_conf)
         self.path = 'Vehicles/' + agent_name
-        state_space = 3 + self.n_beams
+        state_space = self.n_beams
         self.agent = TD3(state_space, 1, 1, agent_name)
         self.agent.try_load(load, h_size, self.path)
 
@@ -75,8 +77,6 @@ class NavTrainVehicle(BaseNav):
             reward = self.calculate_reward(self.state, s_prime)
 
             self.t_his.add_step_data(reward)
-            # mem_entry = (self.nn_state, self.nn_action, nn_s_prime, reward, False)
-            # self.agent.replay_buffer.add(mem_entry)
             self.agent.replay_buffer.add(self.nn_state, self.nn_action, nn_s_prime, reward, False)
 
     def done_entry(self, s_prime):
@@ -86,8 +86,8 @@ class NavTrainVehicle(BaseNav):
         if self.t_his.ptr % 10 == 0 or True:
             self.t_his.print_update()
             self.agent.save(self.path)
-        self.state = None
         self.agent.replay_buffer.add(self.nn_state, self.nn_action, nn_s_prime, reward, False)
+        self.state = None
 
         self.t_his.add_step_data(reward)
         self.t_his.lap_done(False)

@@ -17,8 +17,8 @@ sap_name_dist = f"SapForestDist_{n}"
 sap_name_vel = f"SapForestVel_{n}"
 sap_name_steer = f"SapForestSteer_{n}"
 
-# train_n = 200000
-train_n = 200
+train_n = 200000
+# train_n = 200
 
 
 """
