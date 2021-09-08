@@ -210,9 +210,21 @@ class TestVehicles(TestData):
 
 
 
-def train_vehicle(env, vehicle, steps, obstacles=True):
+def train_vehicle(env, vehicle, steps, obstacles=True, n_buffer=10000):
     done = False
     state = env.reset(obstacles)
+
+    print(f"Building Buffer: {n_buffer}")
+    for n in range(n_buffer):
+        a = vehicle.plan_act(state)
+        s_prime, r, done, _ = env.step_plan(a)
+        state = s_prime
+        
+        if done:
+            vehicle.done_entry(s_prime)
+
+            vehicle.reset_lap()
+            state = env.reset(obstacles)
 
     print(f"Starting Training: {vehicle.name}")
     for n in range(steps):

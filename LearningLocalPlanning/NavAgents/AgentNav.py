@@ -20,20 +20,16 @@ class BaseNav:
         self.range_finder_scale = 5
 
     def transform_obs(self, obs):
-        max_angle = 3.14
-
         state = obs['state']
-        scan = obs['scan'] / self.range_finder_scale
+        scan = obs['scan']/ self.range_finder_scale
         target = obs['target']
 
-        # cur_v = [state[3]/self.max_v]
-        # cur_d = [state[4]/self.max_steer]
-        # target_angle = [target[0]/max_angle]
-        # target_distance = [target[1]/self.distance_scale]
+        cur_v = [state[3]/self.max_v]
+        cur_d = [state[4]/self.max_steer]
+        target_angle = [target[0]/self.max_steer]
+        # dr_scale = [pp_action[0]/self.max_steer]
 
-        # nn_obs = np.concatenate([cur_v, cur_d, target_angle, scan])
-
-        nn_obs = scan
+        nn_obs = np.concatenate([cur_v, cur_d, target_angle, scan])
 
         return nn_obs
 
@@ -43,7 +39,7 @@ class NavTrainVehicle(BaseNav):
     def __init__(self, agent_name, map_name, sim_conf, load=False, h_size=200) -> None:
         BaseNav.__init__(self, agent_name, sim_conf)
         self.path = 'Vehicles/' + agent_name
-        state_space = self.n_beams
+        state_space = self.n_beams + 3
         self.agent = TD3(state_space, 1, 1, agent_name)
         self.agent.try_load(load, h_size, self.path)
 

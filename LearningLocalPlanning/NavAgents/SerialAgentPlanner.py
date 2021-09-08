@@ -131,6 +131,7 @@ class SerialBase(SerialPP):
         target_angle = [target[0]/self.max_steer]
         dr_scale = [pp_action[0]/self.max_steer]
 
+        # nn_obs = np.concatenate([cur_v, cur_d, target_angle, scan])
         nn_obs = np.concatenate([cur_v, cur_d, target_angle, dr_scale, scan])
 
         return nn_obs
