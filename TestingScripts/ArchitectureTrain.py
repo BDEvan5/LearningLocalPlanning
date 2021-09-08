@@ -12,13 +12,14 @@ from GeneralTestTrain import train_vehicle, load_conf
 
 
 map_name = "forest2"
-n = "test"
+# n = "test"
+n = 2
 nav_name = f"Navforest_{n}"
 mod_name = f"ModForest_{n}"
 sap_name = f"SapForest_{n}"
 end_name = f"EndForest_{n}"
 
-train_n = 20000
+train_n = 50000
 # train_n = 200
 
 
@@ -50,8 +51,8 @@ def train_repeatability(VehicleClass, base_name: str):
 
 if __name__ == "__main__":
 
-    # train_planner(ModVehicleTrain, mod_name)
-    # train_planner(SerialVehicleTrain, sap_name)
+    train_planner(ModVehicleTrain, mod_name)
+    train_planner(SerialVehicleTrain, sap_name)
     train_planner(EndVehicleTrain, end_name)
     # train_planner(NavTrainVehicle, nav_name)
 

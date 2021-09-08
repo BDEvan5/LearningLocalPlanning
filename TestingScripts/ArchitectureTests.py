@@ -16,8 +16,8 @@ from GeneralTestTrain import test_single_vehicle, load_conf, TestVehicles
 
 
 map_name = "forest2"
-# train_n = 1
-train_n = "test"
+train_n = 2
+# train_n = "test"
 nav_name = f"Navforest_{train_n}"
 mod_name = f"ModForest_{train_n}"
 sap_name = f"SapForest_{train_n}"
@@ -64,7 +64,9 @@ def comparison_test():
     vehicle = Oracle(sim_conf)
     test.add_vehicle(vehicle)
 
-    vehicle = NavTestVehicle(nav_name, map_name, sim_conf)
+    # vehicle = NavTestVehicle(nav_name, map_name, sim_conf)
+    # test.add_vehicle(vehicle)
+    vehicle = EndVehicleTest(end_name, map_name, sim_conf)
     test.add_vehicle(vehicle)
 
     vehicle = ModVehicleTest(mod_name, map_name, sim_conf)
@@ -97,13 +99,13 @@ if __name__ == "__main__":
     # test_planner(ModVehicleTest, mod_name)
     # test_planner(NavTestVehicle, nav_name)
     # test_planner(SerialVehicleTest, sap_name)
-    test_planner(EndVehicleTest, end_name)
+    # test_planner(EndVehicleTest, end_name)
 
     # test_repeat(NavTestVehicle, "RepeatNav_forest")
     # test_repeat(ModVehicleTest, "RepeatMod_forest")
     # test_repeat(SerialVehicleTest, "RepeatSap_forest")
 
-    # comparison_test()
+    comparison_test()
 
 
 
