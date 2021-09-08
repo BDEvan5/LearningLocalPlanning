@@ -131,8 +131,8 @@ class SerialBase(SerialPP):
         target_angle = [target[0]/self.max_steer]
         dr_scale = [pp_action[0]/self.max_steer]
 
-        nn_obs = np.concatenate([cur_v, cur_d, target_angle, scan])
-        # nn_obs = np.concatenate([cur_v, cur_d, target_angle, dr_scale, scan])
+        # nn_obs = np.concatenate([cur_v, cur_d, target_angle, scan])
+        nn_obs = np.concatenate([cur_v, cur_d, target_angle, dr_scale, scan])
 
         return nn_obs
 
@@ -205,7 +205,7 @@ class SerialVehicleTrain(SerialBase):
         SerialBase.__init__(self, agent_name, map_name, sim_conf)
 
         self.path = 'Vehicles/' + agent_name
-        state_space = 3 + self.n_beams
+        state_space = 4 + self.n_beams
         self.agent = TD3(state_space, 1, 1, agent_name)
         h_size = h_size
         self.agent.try_load(load, h_size, self.path)
