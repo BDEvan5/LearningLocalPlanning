@@ -210,7 +210,7 @@ class TestVehicles(TestData):
 
 
 
-def train_vehicle(env, vehicle, steps, obstacles=True, n_buffer=10000):
+def train_vehicle(env, vehicle, steps, obstacles=True, n_buffer=1000):
     done = False
     state = env.reset(obstacles)
 

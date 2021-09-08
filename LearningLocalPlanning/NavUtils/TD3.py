@@ -227,13 +227,17 @@ class TD3(object):
         state_dim = self.state_dim
         action_dim = self.act_dim
         max_action = self.max_action
-        self.actor = ActorAF(state_dim, action_dim, max_action, h_size)
-        self.actor_target = ActorAF(state_dim, action_dim, max_action, h_size)
+        # self.actor = ActorAF(state_dim, action_dim, max_action, h_size)
+        # self.actor_target = ActorAF(state_dim, action_dim, max_action, h_size)
+        self.actor = Actor(state_dim, action_dim, max_action, h_size)
+        self.actor_target = Actor(state_dim, action_dim, max_action, h_size)
         self.actor_target.load_state_dict(self.actor.state_dict())
         self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=1e-3)
 
-        self.critic = CriticAF(state_dim, action_dim, h_size)
-        self.critic_target = CriticAF(state_dim, action_dim, h_size)
+        # self.critic = CriticAF(state_dim, action_dim, h_size)
+        # self.critic_target = CriticAF(state_dim, action_dim, h_size)
+        self.critic = Critic(state_dim, action_dim, h_size)
+        self.critic_target = Critic(state_dim, action_dim, h_size)
         self.critic_target.load_state_dict(self.critic.state_dict())
         self.critic_optimizer = torch.optim.Adam(self.critic.parameters(), lr=1e-3)
 
