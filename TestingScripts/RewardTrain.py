@@ -17,7 +17,7 @@ sap_name_dist = f"SapForestDist_{n}"
 sap_name_vel = f"SapForestVel_{n}"
 sap_name_steer = f"SapForestSteer_{n}"
 
-train_n = 200000
+train_n = 50000
 # train_n = 200
 
 
@@ -51,7 +51,7 @@ def train_repeatability(VehicleClass, base_name: str):
 if __name__ == "__main__":
     train_planner(SerialVehicleTrain, sap_name_dist, DistReward())
     train_planner(SerialVehicleTrain, sap_name_vel, CthReward(0.004,  0.01))
-    train_planner(SerialVehicleTrain, sap_name_steer, SteeringReward(0.1))
+    train_planner(SerialVehicleTrain, sap_name_steer, SteeringReward(0.01))
 
     # train_repeatability(ModVehicleTrain, "RepeatMod_forest")
     # train_repeatability(NavTrainVehicle, "RepeatNav_forest")

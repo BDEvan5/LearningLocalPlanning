@@ -256,7 +256,7 @@ class SerialVehicleTrain(SerialBase):
         self.t_his.add_step_data(reward)
         self.t_his.lap_done(False)
         if self.t_his.ptr % 10 == 0:
-            self.t_his.print_update(True)
+            self.t_his.print_update(False)
             self.agent.save(self.path)
         self.state = None
 
