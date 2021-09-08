@@ -91,9 +91,9 @@ def test_repeat(VehicleClass, base_name):
 if __name__ == "__main__":
     # test_follow_the_gap()
     # test_oracle()
-    # test_planner(ModVehicleTest, mod_name)
+    test_planner(ModVehicleTest, mod_name)
     # test_planner(NavTestVehicle, nav_name)
-    test_planner(SerialVehicleTest, sap_name)
+    # test_planner(SerialVehicleTest, sap_name)
 
     # test_repeat(NavTestVehicle, "RepeatNav_forest")
     # test_repeat(ModVehicleTest, "RepeatMod_forest")

@@ -164,8 +164,8 @@ class ActorAF(nn.Module):
         self.max_action = max_action
 
     def forward(self, x):
-        x = torch.relu(self.l1(x))
-        x = torch.relu(self.l2(x))
+        x = torch.tanh(self.l1(x))
+        x = torch.tanh(self.l2(x))
         x = self.l3(x)
         x = self.max_action * torch.tanh(x) 
         return x
@@ -187,12 +187,12 @@ class CriticAF(nn.Module):
     def forward(self, x, u):
         xu = torch.cat([x, u], 1)
 
-        x1 = torch.relu(self.l1(xu))
-        x1 = torch.relu(self.l2(x1))
+        x1 = torch.tanh(self.l1(xu))
+        x1 = torch.tanh(self.l2(x1))
         x1 = self.l3(x1)
 
-        x2 = torch.relu(self.l4(xu))
-        x2 = torch.relu(self.l5(x2))
+        x2 = torch.tanh(self.l4(xu))
+        x2 = torch.tanh(self.l5(x2))
         x2 = self.l6(x2)
         return x1, x2
 
