@@ -4,61 +4,61 @@ Map name:
 -----------------------------------------------------
 -----------------------------------------------------
 Vehicle: RepeatNav_forest_0
-Crashes: 10.0 --> Completes 0.0
+Crashes: 100.0 --> Completes 0.0
 % Finished = 0.00
 Avg lap times: 0.0
 No Obs Time: 158.0
 -----------------------------------------------------
 Vehicle: RepeatNav_forest_1
-Crashes: 10.0 --> Completes 0.0
+Crashes: 100.0 --> Completes 0.0
 % Finished = 0.00
 Avg lap times: 0.0
 No Obs Time: 158.0
 -----------------------------------------------------
 Vehicle: RepeatNav_forest_2
-Crashes: 10.0 --> Completes 0.0
+Crashes: 100.0 --> Completes 0.0
 % Finished = 0.00
 Avg lap times: 0.0
-No Obs Time: 138.0
+No Obs Time: 226.0
 -----------------------------------------------------
 Vehicle: RepeatNav_forest_3
-Crashes: 10.0 --> Completes 0.0
+Crashes: 100.0 --> Completes 0.0
 % Finished = 0.00
 Avg lap times: 0.0
 No Obs Time: 158.0
 -----------------------------------------------------
 Vehicle: RepeatNav_forest_4
-Crashes: 10.0 --> Completes 0.0
+Crashes: 100.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 141.0
+-----------------------------------------------------
+Vehicle: RepeatNav_forest_5
+Crashes: 100.0 --> Completes 0.0
 % Finished = 0.00
 Avg lap times: 0.0
 No Obs Time: 157.0
 -----------------------------------------------------
-Vehicle: RepeatNav_forest_5
-Crashes: 10.0 --> Completes 0.0
-% Finished = 0.00
-Avg lap times: 0.0
-No Obs Time: 158.0
------------------------------------------------------
 Vehicle: RepeatNav_forest_6
-Crashes: 10.0 --> Completes 0.0
+Crashes: 100.0 --> Completes 0.0
 % Finished = 0.00
 Avg lap times: 0.0
 No Obs Time: 158.0
 -----------------------------------------------------
 Vehicle: RepeatNav_forest_7
-Crashes: 10.0 --> Completes 0.0
+Crashes: 100.0 --> Completes 0.0
 % Finished = 0.00
 Avg lap times: 0.0
 No Obs Time: 158.0
 -----------------------------------------------------
 Vehicle: RepeatNav_forest_8
-Crashes: 10.0 --> Completes 0.0
+Crashes: 100.0 --> Completes 0.0
 % Finished = 0.00
 Avg lap times: 0.0
 No Obs Time: 158.0
 -----------------------------------------------------
 Vehicle: RepeatNav_forest_9
-Crashes: 10.0 --> Completes 0.0
+Crashes: 100.0 --> Completes 0.0
 % Finished = 0.00
 Avg lap times: 0.0
 No Obs Time: 158.0

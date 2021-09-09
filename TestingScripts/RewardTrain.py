@@ -10,14 +10,14 @@ from GeneralTestTrain import train_vehicle, load_conf
 
 
 map_name = "forest2"
-n = 1
+n = 2
 # nav_name = f"Navforest_{n}"
 # mod_name = f"ModForestDist_{n}"
 sap_name_dist = f"SapForestDist_{n}"
 sap_name_vel = f"SapForestVel_{n}"
 sap_name_steer = f"SapForestSteer_{n}"
 
-train_n = 50000
+train_n = 100000
 # train_n = 200
 
 
