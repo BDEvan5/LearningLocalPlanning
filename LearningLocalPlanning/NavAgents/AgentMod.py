@@ -19,9 +19,9 @@ class ModPP:
         self.wheelbase = sim_conf.l_f + sim_conf.l_r
         self.max_steer = sim_conf.max_steer
 
-        self.v_gain = 0.5
-        self.lookahead = 0.8
-        self.max_reacquire = 20
+        self.v_gain = sim_conf.v_gain
+        self.lookahead = sim_conf.lookahead
+        self.max_reacquire = sim_conf.max_reacquire
 
         self.waypoints = None
         self.vs = None
@@ -98,19 +98,17 @@ class ModHistory:
 
 
 class BaseMod(ModPP):
-    def __init__(self, agent_name, map_name, sim_conf) -> None:
+    def __init__(self, agent_name, sim_conf) -> None:
         super().__init__(sim_conf)
         self.name = agent_name
         self.n_beams = sim_conf.n_beams
         self.max_v = sim_conf.max_v
         self.max_steer = sim_conf.max_steer
-        self.range_finder_scale = 5 #TODO: move to config files
+        self.range_finder_scale = sim_conf.range_finder_scale
 
         self.history = ModHistory()
 
-        self.distance_scale = 20 # max meters for scaling
-
-        self._load_csv_track(map_name)
+        self._load_csv_track(sim_conf.map_name)
 
     def transform_obs(self, obs, pp_action):
         """
@@ -191,7 +189,7 @@ class BaseMod(ModPP):
 
 
 class ModVehicleTrain(BaseMod):
-    def __init__(self, agent_name, map_name, sim_conf, load=False, h_size=200):
+    def __init__(self, agent_name, sim_conf, load=False):
         """
         Training vehicle using the reference modification navigation stack
 
@@ -202,13 +200,12 @@ class ModVehicleTrain(BaseMod):
             load: if the network should be loaded or recreated.
         """
 
-        BaseMod.__init__(self, agent_name, map_name, sim_conf)
+        BaseMod.__init__(self, agent_name, sim_conf)
 
         self.path = 'Vehicles/' + agent_name
         state_space = 4 + self.n_beams
         self.agent = TD3(state_space, 1, 1, agent_name)
-        h_size = h_size
-        self.agent.try_load(load, h_size, self.path)
+        self.agent.try_load(load, sim_conf.h_size, self.path)
 
         self.state = None
         self.nn_state = None
@@ -272,7 +269,7 @@ class ModVehicleTrain(BaseMod):
 
 
 class ModVehicleTest(BaseMod):
-    def __init__(self, agent_name, map_name, sim_conf):
+    def __init__(self, agent_name, sim_conf):
         """
         Testing vehicle using the reference modification navigation stack
 
@@ -282,13 +279,10 @@ class ModVehicleTest(BaseMod):
             mod_conf: namespace with modification planner parameters
         """
 
-        BaseMod.__init__(self, agent_name, map_name, sim_conf)
-
+        BaseMod.__init__(self, agent_name, sim_conf)
         self.path = 'Vehicles/' + agent_name
 
         self.actor = torch.load(self.path + '/' + agent_name + "_actor.pth")
-        self.n_beams = 10
-
         print(f"Agent loaded: {agent_name}")
 
 
