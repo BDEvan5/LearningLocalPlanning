@@ -10,14 +10,14 @@ from GeneralTestTrain import train_vehicle, load_conf
 
 
 map_name = "forest2"
-n = 2
+n = 3
 # nav_name = f"Navforest_{n}"
 # mod_name = f"ModForestDist_{n}"
 sap_name_dist = f"SapForestDist_{n}"
 sap_name_vel = f"SapForestVel_{n}"
 sap_name_steer = f"SapForestSteer_{n}"
 
-train_n = 100000
+train_n = 200000
 # train_n = 200
 
 
@@ -25,9 +25,9 @@ train_n = 100000
 Training Functions
 """
 def train_planner(VehicleClass, agent_name, reward):
-    sim_conf = load_conf("", "std_config")
-    env = ForestSim(map_name, sim_conf)
-    vehicle = VehicleClass(agent_name, map_name, sim_conf, h_size=200)
+    sim_conf = load_conf("", "test_config")
+    env = ForestSim(sim_conf)
+    vehicle = VehicleClass(agent_name, sim_conf)
     vehicle.calculate_reward = reward
 
     train_vehicle(env, vehicle, train_n)
@@ -35,13 +35,13 @@ def train_planner(VehicleClass, agent_name, reward):
 
 
 def train_repeatability(VehicleClass, base_name: str):
-    sim_conf = load_conf("", "std_config")
+    sim_conf = load_conf("", "test_config")
     env = ForestSim(map_name, sim_conf)
 
     for i in range(10):
         train_name = base_name + f"_{i}"
 
-        vehicle = VehicleClass(train_name, map_name, sim_conf, load=False)
+        vehicle = VehicleClass(train_name, sim_conf, load=False)
 
         train_vehicle(env, vehicle, train_n)
 
