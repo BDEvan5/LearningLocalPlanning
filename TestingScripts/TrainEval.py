@@ -6,40 +6,26 @@ from LearningLocalPlanning.NavUtils.RewardFunctions import *
 
 from GeneralTestTrain import train_vehicle, eval_vehicle, load_conf
 import yaml
+import time
 
 """
 Training Functions
 """
-def train_repeatability(VehicleClass, base_name: str):
+def run_repeatability_tests(n):
     sim_conf = load_conf("", "test_config")
-    env = ForestSim(sim_conf)
-
-    for i in range(10):
-        train_name = base_name + f"_{i}"
-
-        vehicle = VehicleClass(train_name, sim_conf, load=False)
-
-        train_vehicle(env, vehicle)
-
-def run_network_tests():
-    hsizes = [50, 100, 200, 400] 
-
-
-def run_step_tests(n):
-    sim_conf = load_conf("", "test_config")
-    test_name = "TrainingSteps"
-    t_steps = [5000, 10000, 20000, 40000, 80000, 120000]
-    # t_steps = [200, 400, 800, 1200, 1600, 2000]
-    # t_steps = [2000]
-    # sim_conf.buffer_n = 10
-    for t in t_steps:
-        sim_conf.train_n = t
+    test_name = "Repeat"
+    agents = range(10)
+    # agents = [9]
+    sim_conf.buffer_n = 1000
+    sim_conf.train_n = 20000
+    sim_conf.test_n = 100
+    for t in agents:
         env = ForestSim(sim_conf)
         agent_name = f"Sap_{test_name}_{t}_{n}"
-        # training_vehicle = SerialVehicleTrain(agent_name, sim_conf)
+        training_vehicle = SerialVehicleTrain(agent_name, sim_conf)
         # vehicle.calculate_reward = DistReward()
 
-        # train_vehicle(env, training_vehicle, sim_conf)
+        train_vehicle(env, training_vehicle, sim_conf)
 
         test_vehicle = SerialVehicleTest(agent_name, sim_conf)
         eval_dict = eval_vehicle(env, test_vehicle, sim_conf)
@@ -53,10 +39,98 @@ def run_step_tests(n):
             yaml.dump(config_dict, file)
 
 
+def run_step_tests(n):
+    sim_conf = load_conf("", "test_config")
+    test_name = "TrainingSteps"
+    t_steps = [5000, 10000, 20000, 40000, 60000, 80000]
+    
+    for t in t_steps:
+
+        sim_conf.train_n = t
+        env = ForestSim(sim_conf)
+        agent_name = f"Sap_{test_name}_{t}_{n}"
+        training_vehicle = SerialVehicleTrain(agent_name, sim_conf)
+        # vehicle.calculate_reward = DistReward()
+
+        train_time = train_vehicle(env, training_vehicle, sim_conf)
+
+        test_vehicle = SerialVehicleTest(agent_name, sim_conf)
+        eval_dict = eval_vehicle(env, test_vehicle, sim_conf)
+
+        config_dict = vars(sim_conf)
+        config_dict['EvalName'] = test_name 
+        config_dict['train_time'] = train_time
+        config_dict['test_number'] = n
+        config_dict.update(eval_dict)
+
+        with open(f"EvalVehicles/{agent_name}/{agent_name}_record.yaml", 'w') as file:
+            yaml.dump(config_dict, file)
+
+def run_beams_tests(n):
+    sim_conf = load_conf("", "test_config")
+    test_name = "Beams"
+    variable_list = [5, 10, 15, 20, 25, 30]
+    # variable_list = [15, 25]
+    sim_conf.buffer_n = 1000
+    sim_conf.train_n = 20000
+    sim_conf.test_n = 100
+    sim_conf.h_size = 100
+    for variable in variable_list:
+        sim_conf.n_beams = variable
+        env = ForestSim(sim_conf)
+        agent_name = f"Sap_{test_name}_{variable}_{n}"
+        training_vehicle = SerialVehicleTrain(agent_name, sim_conf)
+        # vehicle.calculate_reward = DistReward()
+
+        train_time = train_vehicle(env, training_vehicle, sim_conf)
+
+        test_vehicle = SerialVehicleTest(agent_name, sim_conf)
+        eval_dict = eval_vehicle(env, test_vehicle, sim_conf)
+
+        config_dict = vars(sim_conf)
+        config_dict['EvalName'] = test_name 
+        config_dict['test_number'] = n
+        config_dict['train_time'] = train_time
+        config_dict.update(eval_dict)
+
+        with open(f"EvalVehicles/{agent_name}/{agent_name}_record.yaml", 'w') as file:
+            yaml.dump(config_dict, file)
+
+def run_hsize_tests(n):
+    sim_conf = load_conf("", "test_config")
+    test_name = "SizeH"
+    hsizes = [10, 20, 50, 100, 200] 
+    sim_conf.buffer_n = 1000
+    sim_conf.train_n = 20000
+    sim_conf.test_n = 100
+    for h in hsizes:
+        sim_conf.h_size = h
+        env = ForestSim(sim_conf)
+        agent_name = f"Sap_{test_name}_{h}_{n}"
+        # training_vehicle = SerialVehicleTrain(agent_name, sim_conf)
+        # vehicle.calculate_reward = DistReward()
+
+        # train_time = train_vehicle(env, training_vehicle, sim_conf)
+
+        test_vehicle = SerialVehicleTest(agent_name, sim_conf)
+        eval_dict = eval_vehicle(env, test_vehicle, sim_conf)
+
+        config_dict = vars(sim_conf)
+        config_dict['EvalName'] = test_name 
+        config_dict['test_number'] = n
+        # config_dict['train_time'] = train_time
+        config_dict.update(eval_dict)
+
+        with open(f"EvalVehicles/{agent_name}/{agent_name}_record.yaml", 'w') as file:
+            yaml.dump(config_dict, file)
+
+
 
 
 
 if __name__ == "__main__":
-    run_step_tests(1)
-
+    run_step_tests(2)
+    # run_hsize_tests(1)
+    # run_beams_tests(2)
+    # run_repeatability_tests(1)
 

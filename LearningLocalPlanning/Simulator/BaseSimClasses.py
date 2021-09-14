@@ -379,14 +379,14 @@ class BaseSim:
         """
         car_obs = self.state
         pose = car_obs[0:3]
-        full_scan = self.scan_sim.scan(pose, 1000)
-        scan = self.scan_sim.scan(pose, 10)
+        # full_scan = self.scan_sim.scan(pose, 1000)
+        scan = self.scan_sim.scan(pose, self.scan_sim.number_of_beams)
         target = self.get_target_obs()
 
         observation = {}
         observation['state'] = car_obs
         observation['scan'] = scan 
-        observation['full_scan'] = full_scan
+        # observation['full_scan'] = full_scan
         observation['target'] = target
         observation['reward'] = self.reward
 

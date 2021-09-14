@@ -1,9 +1,9 @@
 ---
 output:
-  
-  
   pdf_document: 
     number_sections: yes
+    fig_caption: yes
+    fig_height: 4
 title: Learning Formulation Optimisation for Obstacle Avoidance in Autonomous Racing
 author: Benjamin Evans
 # date: September 2021
@@ -13,109 +13,149 @@ editor_options:
     wrap: sentence
 ---
 
-# 
+```{r, echo=FALSE, include=FALSE}
+test_data = read.csv("DataTable.csv")
+# knitr::opts_chunk$set(include = FALSE)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
 
 # Introduction
 
 This paper explores the effect of training parameters on an agent learning the task of unmapped obstacle avoidance in autonomous racing.
-For the study, we use the serial agent planner presented in \cite{} as our navigation stack.
+The serial agent planning architecture is used for the evaluation.
+For each study, tests are run for a set of perturbations from baseline values.
+Several parameters are chosen for study.
 
-# Evaluation Methodology
+## Evaluation Methodology
 
-The planner is trained and tested in simulation using the official open-source F1/10th simulator \footnote{Available online: \url{www.GitHub.com/}}.
+The simulations are run in the custom built F1/10th simulator.
+The task is to use a LiDAR scan and the vehicles current heading and velocity to determine the steering angle that will lead the vehicle to the end of the forest without colliding with any obstacles.
 
-\subsection{Metrics}
+The base learning formulation uses a reward signal that rewards progress along the track.
+The track is a straight 20m long section of road with 4 obstacles randomly spawned on each episode.
+
+## Metrics
 
 The two main metrics are performance and success rate, since these are the measure of racing performance.
 The sample efficiency, repeatability and robustness of the policy are also measured.
 
-We measure the performance of the agent after training it in batches of 10,000's.
-When the performance difference between subsequent batches is negligible ($<1\%$) then we assume the network has converged.
 
-\subsubsection{Robustness to Sensor Noise}
+# Repeatability & Distribution
 
-In the real world, all sensor measurements are noisy.
-Therefore, we evaluate the ability of our agents to perform in noisy environments.
-5, 10 and 20% noise values are added to the measurements and the results measured.
+The repeatability of the training and testing is studied to measure the statistical significance of the results.
+An agent is trained 10 times with the same parameters and the distribution of the results is studied.
 
-\subsection{Learning Variables Studied}
+```{r}
 
-\subsubsection{Neural Network Architecture}
 
-The neural network architecture is studied along the two parameters of the number of neurons and depth of layers.
-A preliminary study on the kind of activation function is also conducted.
-
-\subsubsection{Reward Signal}
-
-The reward signal is used to encode the desired racing behaviour in an equation that tells the agent how good or bad it's performance is.
-The follow five reward signals are considered:
-
-```{=tex}
-\begin{enumerate}
-    \item Progress-based reward
-    \item Velocity-based reward
-    \item Action-based (minimum steering) reward
-    \item Distance to obstacle 
-    \item Distance to boundary
-\end{enumerate}
 ```
-\subsubsection{Reward Hyper-parameters}
+
+
+# Learning Parametes
+
+The learning setup parameters of the number of beams used in the LiDAR scan, the number of training steps trained for, and the size of the hidden layers of the network are evaluated for their effect on the results.
+
+## Neural Network Architecture
+
+The number of neurons in the two hidden layers of the networks is changed to determine if this has an effect on the agents ability to learn an accurate policy.
+A similar approach, using 60 range finders and several state variables, used networks with two hidden layers of 256 neurons. 
+<!-- @fuchs2021super. -->
+Considering that we are generally using few range finder readings, we perturb this value downwards to see if it has any effect on the outcome.
+
+```{r, h_size_fig, fig.cap="Study on Size of Hidden Layers"}
+h_mask = which(test_data$EvalName=="SizeH")
+x_data = test_data$h_size[h_mask]
+y_data = test_data$avg_times[h_mask]
+plot(x_data, y_data, xlab="Hidden Layer Size", ylab="Average Lap Times", col="blue", type="o", pch=16, cex=2)
+```
+Figure \@ref(fig:h_size_fig) shows how for different hidden layer sizes after 100 neurons, there is a negligible change in the performance of the vehicle.
+For smaller network sizes, the average lap times become a lot worse.
+Therefore, 100 neurons is chosen as the size to be used.
+
+## Number of LiDAR Beams
+
+LiDAR sensors provides dense spatial data of the surrounding environment and can have up to 1000 beams. 
+Only several beams are sampled from the full scan to keep training times fast and the network small.
+Originally 10 beams were used to build on work by Tai et al. 
+
+```{r}
+beam_mask = which(test_data$EvalName=="Beams")
+plot(test_data$n_beams[beam_mask], test_data$success_rate[beam_mask], xlab="Number of Beams", ylab="Success Rate", col="red", pch=16, cex=2)
+```
+
+The results show that using 15 range finders has a marked difference over using only 10.
+Above 15 range finders the performance levels off. 
+Therefore, 15 range finders are selected for use.
+
+Further study on the LiDAR scan could look at the distance used for scaling and clipping, the effect of noise in the readings and the field of view.
+
+## Training Steps
+
+While reinforcement has the advantage of being able to learn from the agent's own experience, it is often sample inefficient.
+The number of steps required to train the agent to convergence is measured.
+
+```{r}
+step_mask = which(test_data$EvalName=="TrainingSteps")
+x_data = test_data$train_n[step_mask]
+y_data = test_data$avg_times[step_mask]
+plot(x_data, y_data, xlab="Training Steps", ylab="Average Lap Times", col="blue", pch=16, cex=2)
+```
+The graph shows that the performance levels out after 20,000 training steps.
+Therefore, the training time is decreased.
+The next figure provides a more zoomed in look at the success rate for shorter training steps.
+
+```{r}
+step_mask = which(test_data$EvalName=="TrainingSteps")
+x_data = test_data$train_n[step_mask]
+y_data = test_data$success_rate[step_mask]
+plot(x_data, y_data, xlab="Training Steps", ylab="Success Rate", xlim=c(0,50000), col="red", pch=16, cex=2)
+```
+
+
+# Reward Signals
+
+## Comparison
+Five different reward signals are selected and used to train agents.
+The table below shows the average results from training 5 agents with each reward signal.
+
+```{r}
+# reward_mask = which(test_data$EvalName=="Reward")
+# progress_times = test_data$avg_times[which(test_data$reward=='progress')]
+# data = c(test_data$reward, test_data$avg_times)
+# knitr::kable(data, caption="Reward Function")
+
+# frame = data.frame(test_data)
+# print(fram)
+```
+
+## Progress Hyper-Parameters
 
 The progress-based reward signal is then selected for further study.
 The reward consists of three different terms that are individually adjusted to determine their effect.
 An additional change is to consider the distance squared at each timestep.
-% (1+i)\^2
 
-\subsubsection{Algorithm}
+# Future Studies
 
-The algorithm used to train the agent is evaluated.
-The main comparison is between the two state of the art algorithms for continuous control, SAC and TD3.
+The follow future studies can be carried out:
+- Algorithm used, specifically TD3 vs SAC
+- Window stacking, does stacking 2 or 3 windows help?
+- Effect of each state variable, are the current velocity and steering needed?
 
-\subsubsection{Considerations}
-
-```{=tex}
-\begin{itemize}
-    \item Noise in training
-    \item Replay memory size
-    \item Learning rate?
-    \item Batch size? 
-    \item 
-\end{itemize}
-```
-\subsection{Physical Parameters Studied}
-
-\subsubsection{Number of Range Finders}
-
-We experiment with how the number of range finders affects the training performance.
-5, 10, 20 and 40 range finders are used.
-With 10 range finders, we vary the field of view from $\pi/2$ to $\pi$.
-We also consider the effect of the max range finder range, 3, 5 and 10 meters are used.
-
-Range finders in real life include a certain amount of noise.
-We consider adding different quantities of noise in the training process and then measure the resulting policies to robustness to noise in readings.
-
-\subsubsection{Stacking Windows}
-
-We evaluate the effect of stacking multiple windows on top of each other.
-1, 2, 5 and 10 windows are used in the analysis.
-
-\subsubsection{State Variable}
-
-The original state variable consists of 14 values.
-We remove each value and consider what effect it has on the training.
-
-# Results
-
-```{r}
-test_data = read.csv("DataTable.csv")
-attach(test_data)
-# plot(train_n, success_rate)
-plot(train_n, avg_times)
-
-
-```
 
 
 # Conclusions
 
-# Bibliography
+This report focused on the evaluation and tuning on the serial planning architecture for unmapped obstacle avoidance.
+The table below presents the final values that were selected to produce the best performance.
+
+| Parameter | Value |
+|:-------|:------|
+|Hidden layer size | 100 |
+|Training steps | 20000 |
+|LiDAR beams  | 15 |
+|Reward Signal | |
+
+
+
+<!-- # Bibliography -->

@@ -5,7 +5,7 @@ from argparse import Namespace
 # from ResultsTest import TestVehicles
 
 import numpy as np
-import csv 
+import csv, time
 
 def load_conf(path, fname):
     full_path = path + 'config/' + fname + '.yaml'
@@ -290,6 +290,8 @@ class TestVehicles(TestData):
 
 
 def train_vehicle(env, vehicle, sim_conf):
+    start_time = time.time()
+
     done = False
     state = env.reset(True)
 
@@ -326,5 +328,8 @@ def train_vehicle(env, vehicle, sim_conf):
     vehicle.t_his.save_csv_data()
     vehicle.agent.save(vehicle.path)
 
-    print(f"Finished Training: {vehicle.name}")
+    train_time = time.time() - start_time
+    print(f"Finished Training: {vehicle.name} in {train_time} seconds")
+
+    return train_time 
 
