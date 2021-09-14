@@ -202,7 +202,7 @@ class SerialVehicleTrain(SerialBase):
 
         SerialBase.__init__(self, agent_name, sim_conf)
 
-        self.path = 'Vehicles/' + agent_name
+        self.path = 'EvalVehicles/' + agent_name
         state_space = 4 + self.n_beams
         self.agent = TD3(state_space, 1, 1, agent_name)
         self.agent.try_load(load, sim_conf.h_size, self.path)
@@ -273,7 +273,7 @@ class SerialVehicleTest(SerialBase):
 
         SerialBase.__init__(self, agent_name, sim_conf)
 
-        self.path = 'Vehicles/' + agent_name
+        self.path = 'EvalVehicles/' + agent_name
         self.actor = torch.load(self.path + '/' + agent_name + "_actor.pth")
         self.n_beams = 10
 

@@ -1,6 +1,4 @@
-
-
-
+# car parameters
 mu: 0.523
 m: 3.47
 g: 9.81
@@ -8,27 +6,39 @@ l_r: 0.171
 l_f: 0.158
 force_f: 0.9
 
+# limits
 max_v: 7
 max_a: 8.5
 max_steer: 0.4
 max_d_dot: 3.2
 
-n_beams: 10
-range_finder_scale: 5
+# simulation parameters 
 time_step: 0.01
 plan_steps: 10
 max_steps: 5000
-
 end_distance: 1
-
-dis_scale: 1 # I don't know if this is the right place for this???
-h_size: 200
 map_name: "forest2"
+n_obstacles: 4
+
+# PP parametes
+v_gain: 0.5
+lookahead: 0.8
+max_reacquire: 20
+
+# training parameters
+n_beams: 10
+range_finder_scale: 5
+h_size: 200
+activation: 'relu'
+layers: 2
+
+# Reward
+reward: 'progress'
+s_mul: 1
 
 train_n: 200
 # train_n: 100000
 buffer_n: 1000
 
-v_gain: 0.5
-lookahead: 0.8
-max_reacquire: 20
+test_n: 10
+

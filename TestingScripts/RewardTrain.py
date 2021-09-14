@@ -49,9 +49,10 @@ def train_repeatability(VehicleClass, base_name: str):
 
 
 if __name__ == "__main__":
-    train_planner(SerialVehicleTrain, sap_name_dist, DistReward())
-    train_planner(SerialVehicleTrain, sap_name_vel, CthReward(0.004,  0.01))
-    train_planner(SerialVehicleTrain, sap_name_steer, SteeringReward(0.01))
+    train_planner(SerialVehicleTrain, "SapForestSquare_3", DistRewardSquare())
+    # train_planner(SerialVehicleTrain, sap_name_dist, DistReward())
+    # train_planner(SerialVehicleTrain, sap_name_vel, CthReward(0.004,  0.01))
+    # train_planner(SerialVehicleTrain, sap_name_steer, SteeringReward(0.01))
 
     # train_repeatability(ModVehicleTrain, "RepeatMod_forest")
     # train_repeatability(NavTrainVehicle, "RepeatNav_forest")

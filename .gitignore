@@ -10,3 +10,7 @@ Vehicles/
 LearningLocalPlanning/Simulator/__pycache__/
 
 ImitationData/
+
+*.pth
+
+EvalVehicles/

@@ -4,20 +4,26 @@ Map name:
 -----------------------------------------------------
 -----------------------------------------------------
 Vehicle: SapForestDist_3
-Crashes: 8.0 --> Completes 92.0
-% Finished = 92.00
-Avg lap times: 424.10869565217394
-No Obs Time: 373.0
+Crashes: 100.0 --> Completes 0.0
+% Finished = 0.00
+Avg lap times: 0.0
+No Obs Time: 158.0
 -----------------------------------------------------
 Vehicle: SapForestVel_3
-Crashes: 4.0 --> Completes 96.0
-% Finished = 96.00
-Avg lap times: 1310.3125
-No Obs Time: 1359.0
+Crashes: 0.0 --> Completes 100.0
+% Finished = 100.00
+Avg lap times: 1302.13
+No Obs Time: 1415.0
 -----------------------------------------------------
 Vehicle: SapForestSteer_3
-Crashes: 12.0 --> Completes 88.0
-% Finished = 88.00
-Avg lap times: 544.6590909090909
-No Obs Time: 410.0
+Crashes: 8.0 --> Completes 92.0
+% Finished = 92.00
+Avg lap times: 544.7826086956521
+No Obs Time: 403.0
+-----------------------------------------------------
+Vehicle: SapForestSquare_3
+Crashes: 10.0 --> Completes 90.0
+% Finished = 90.00
+Avg lap times: 432.4222222222222
+No Obs Time: 375.0
 -----------------------------------------------------

@@ -45,6 +45,9 @@ def comparison_test():
     vehicle = SerialVehicleTest(sap_name_steer, sim_conf)
     test.add_vehicle(vehicle)
 
+    vehicle = SerialVehicleTest("SapForestSquare_3", sim_conf)
+    test.add_vehicle(vehicle)
+
     # test.run_eval(env, 1, True)
     test.run_eval(env, test_n, False, wait=False)
 
@@ -68,6 +71,7 @@ if __name__ == "__main__":
     # test_planner(SerialVehicleTest, sap_name_dist)
     # test_planner(SerialVehicleTest, sap_name_vel)
     # test_planner(SerialVehicleTest, sap_name_steer)
+    # test_planner(SerialVehicleTest, "SapForestSquare_3")
 
     comparison_test()
 

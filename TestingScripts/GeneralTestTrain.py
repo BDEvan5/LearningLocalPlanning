@@ -61,6 +61,76 @@ def test_single_vehicle(env, vehicle, show=False, laps=100, add_obs=True, wait=F
     print(f"Completes: {completes} --> {(completes / (completes + crashes) * 100):.2f} %")
     print(f"Lap times Avg: {np.mean(lap_times)} --> Std: {np.std(lap_times)}")
 
+def eval_vehicle(env, vehicle, sim_conf, show=False):
+    crashes = 0
+    completes = 0
+    lap_times = [] 
+
+    state = env.reset(False)
+    done, score = False, 0.0
+
+    while not done:
+        a = vehicle.plan_act(state)
+        s_p, r, done, _ = env.step_plan(a)
+        state = s_p
+    if show:
+        env.render(wait=False, name=vehicle.name)
+    no_obs_time = np.copy(env.steps) 
+    print(f"Complete no obs -> time: {env.steps}")
+
+    state = env.reset(True)
+    done, score = False, 0.0
+    for i in range(sim_conf.test_n):
+        try:
+            vehicle.plan_forest(env.env_map)
+        except AttributeError as e:
+            pass
+        while not done:
+            a = vehicle.plan_act(state)
+            s_p, r, done, _ = env.step_plan(a)
+            state = s_p
+        if show:
+            env.render(wait=False, name=vehicle.name)
+
+        if r == -1:
+            crashes += 1
+            print(f"({i}) Crashed -> time: {env.steps} ")
+        else:
+            completes += 1
+            print(f"({i}) Complete -> time: {env.steps}")
+            lap_times.append(env.steps)
+        state = env.reset(True)
+        
+        vehicle.reset_lap()
+        done = False
+
+    success_rate = (completes / (completes + crashes) * 100)
+    if len(lap_times) > 0:
+        avg_times, std_dev = np.mean(lap_times), np.std(lap_times)
+    else:
+        avg_times, std_dev = 0, 0
+
+
+    print(f"Crashes: {crashes}")
+    print(f"Completes: {completes} --> {success_rate:.2f} %")
+    print(f"Lap times Avg: {avg_times} --> Std: {std_dev}")
+
+    test_name = 'EvalVehicles/'  + vehicle.name + f"/{vehicle.name}_eval" + '.csv'
+
+    data = [["#", "Name", "%Complete", "AvgTime", "Std", "NoObs"]]
+    v_data = [0]
+    v_data.append(vehicle.name)
+    v_data.append(success_rate * 100)
+    v_data.append(avg_times)
+    v_data.append(avg_times)
+    v_data.append(no_obs_time)
+    data.append(v_data)
+
+    with open(test_name, 'w') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerows(data)
+
+    print(f"Finished running test and saving file with results.")
 
 
 """Testing Function"""
@@ -210,12 +280,12 @@ class TestVehicles(TestData):
 
 
 
-def train_vehicle(env, vehicle, steps, obstacles=True, n_buffer=1000):
+def train_vehicle(env, vehicle, sim_conf):
     done = False
-    state = env.reset(obstacles)
+    state = env.reset(True)
 
-    print(f"Building Buffer: {n_buffer}")
-    for n in range(n_buffer):
+    print(f"Building Buffer: {sim_conf.buffer_n}")
+    for n in range(sim_conf.buffer_n):
         a = vehicle.plan_act(state)
         s_prime, r, done, _ = env.step_plan(a)
         state = s_prime
@@ -224,26 +294,24 @@ def train_vehicle(env, vehicle, steps, obstacles=True, n_buffer=1000):
             vehicle.done_entry(s_prime)
 
             vehicle.reset_lap()
-            state = env.reset(obstacles)
+            state = env.reset(True)
+        
+        vehicle.reset_lap()
+        state = env.reset(True)
 
     print(f"Starting Training: {vehicle.name}")
-    for n in range(steps):
+    for n in range(sim_conf.train_n):
         a = vehicle.plan_act(state)
         s_prime, r, done, _ = env.step_plan(a)
 
         state = s_prime
         vehicle.agent.train(2)
         
-        # env.render(False)
-        
         if done:
             vehicle.done_entry(s_prime)
-            # vehicle.show_vehicle_history()
-            # env.history.show_history()
-            # env.render(wait=False, name=vehicle.name)
 
             vehicle.reset_lap()
-            state = env.reset(obstacles)
+            state = env.reset(True)
 
     vehicle.t_his.print_update(True)
     vehicle.t_his.save_csv_data()
