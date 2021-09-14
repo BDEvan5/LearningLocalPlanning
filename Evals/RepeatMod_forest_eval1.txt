@@ -4,62 +4,62 @@ Map name:
 -----------------------------------------------------
 -----------------------------------------------------
 Vehicle: RepeatMod_forest_0
-Crashes: 12.0 --> Completes 88.0
-% Finished = 88.00
-Avg lap times: 496.75
+Crashes: 22.0 --> Completes 78.0
+% Finished = 78.00
+Avg lap times: 515.9615384615385
 No Obs Time: 463.0
 -----------------------------------------------------
 Vehicle: RepeatMod_forest_1
-Crashes: 11.0 --> Completes 89.0
-% Finished = 89.00
-Avg lap times: 471.4719101123595
+Crashes: 10.0 --> Completes 90.0
+% Finished = 90.00
+Avg lap times: 459.2
 No Obs Time: 374.0
 -----------------------------------------------------
 Vehicle: RepeatMod_forest_2
-Crashes: 24.0 --> Completes 76.0
-% Finished = 76.00
-Avg lap times: 453.4605263157895
+Crashes: 18.0 --> Completes 82.0
+% Finished = 82.00
+Avg lap times: 453.0853658536585
 No Obs Time: 387.0
 -----------------------------------------------------
 Vehicle: RepeatMod_forest_3
-Crashes: 14.0 --> Completes 86.0
-% Finished = 86.00
-Avg lap times: 528.2441860465116
+Crashes: 11.0 --> Completes 89.0
+% Finished = 89.00
+Avg lap times: 520.4943820224719
 No Obs Time: 388.0
 -----------------------------------------------------
 Vehicle: RepeatMod_forest_4
-Crashes: 28.0 --> Completes 72.0
-% Finished = 72.00
-Avg lap times: 517.6527777777778
+Crashes: 19.0 --> Completes 81.0
+% Finished = 81.00
+Avg lap times: 526.6296296296297
 No Obs Time: 396.0
 -----------------------------------------------------
 Vehicle: RepeatMod_forest_5
 Crashes: 11.0 --> Completes 89.0
 % Finished = 89.00
-Avg lap times: 464.87640449438203
+Avg lap times: 456.8876404494382
 No Obs Time: 379.0
 -----------------------------------------------------
 Vehicle: RepeatMod_forest_6
-Crashes: 9.0 --> Completes 91.0
-% Finished = 91.00
-Avg lap times: 540.065934065934
+Crashes: 12.0 --> Completes 88.0
+% Finished = 88.00
+Avg lap times: 521.8409090909091
 No Obs Time: 390.0
 -----------------------------------------------------
 Vehicle: RepeatMod_forest_7
-Crashes: 23.0 --> Completes 77.0
-% Finished = 77.00
-Avg lap times: 438.76623376623377
+Crashes: 19.0 --> Completes 81.0
+% Finished = 81.00
+Avg lap times: 442.3703703703704
 No Obs Time: 374.0
 -----------------------------------------------------
 Vehicle: RepeatMod_forest_8
-Crashes: 12.0 --> Completes 88.0
-% Finished = 88.00
-Avg lap times: 478.9318181818182
+Crashes: 13.0 --> Completes 87.0
+% Finished = 87.00
+Avg lap times: 480.6551724137931
 No Obs Time: 376.0
 -----------------------------------------------------
 Vehicle: RepeatMod_forest_9
-Crashes: 14.0 --> Completes 86.0
-% Finished = 86.00
-Avg lap times: 470.0813953488372
+Crashes: 22.0 --> Completes 78.0
+% Finished = 78.00
+Avg lap times: 472.87179487179486
 No Obs Time: 411.0
 -----------------------------------------------------

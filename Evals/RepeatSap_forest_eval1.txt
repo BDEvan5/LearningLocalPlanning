@@ -6,60 +6,60 @@ Map name:
 Vehicle: RepeatSap_forest_0
 Crashes: 9.0 --> Completes 91.0
 % Finished = 91.00
-Avg lap times: 463.2637362637363
+Avg lap times: 473.46153846153845
 No Obs Time: 398.0
 -----------------------------------------------------
 Vehicle: RepeatSap_forest_1
-Crashes: 8.0 --> Completes 92.0
-% Finished = 92.00
-Avg lap times: 442.5326086956522
+Crashes: 11.0 --> Completes 89.0
+% Finished = 89.00
+Avg lap times: 454.0112359550562
 No Obs Time: 383.0
 -----------------------------------------------------
 Vehicle: RepeatSap_forest_2
-Crashes: 6.0 --> Completes 94.0
-% Finished = 94.00
-Avg lap times: 446.82978723404256
+Crashes: 5.0 --> Completes 95.0
+% Finished = 95.00
+Avg lap times: 451.1578947368421
 No Obs Time: 375.0
 -----------------------------------------------------
 Vehicle: RepeatSap_forest_3
-Crashes: 5.0 --> Completes 95.0
-% Finished = 95.00
-Avg lap times: 547.4421052631579
+Crashes: 3.0 --> Completes 97.0
+% Finished = 97.00
+Avg lap times: 569.9484536082474
 No Obs Time: 428.0
 -----------------------------------------------------
 Vehicle: RepeatSap_forest_4
-Crashes: 14.0 --> Completes 86.0
-% Finished = 86.00
-Avg lap times: 418.95348837209303
+Crashes: 13.0 --> Completes 87.0
+% Finished = 87.00
+Avg lap times: 422.6551724137931
 No Obs Time: 378.0
 -----------------------------------------------------
 Vehicle: RepeatSap_forest_5
-Crashes: 30.0 --> Completes 70.0
-% Finished = 70.00
-Avg lap times: 460.0
+Crashes: 33.0 --> Completes 67.0
+% Finished = 67.00
+Avg lap times: 467.5223880597015
 No Obs Time: 385.0
 -----------------------------------------------------
 Vehicle: RepeatSap_forest_6
-Crashes: 8.0 --> Completes 92.0
-% Finished = 92.00
-Avg lap times: 424.42391304347825
+Crashes: 9.0 --> Completes 91.0
+% Finished = 91.00
+Avg lap times: 418.4725274725275
 No Obs Time: 373.0
 -----------------------------------------------------
 Vehicle: RepeatSap_forest_7
-Crashes: 6.0 --> Completes 94.0
-% Finished = 94.00
-Avg lap times: 473.7340425531915
+Crashes: 7.0 --> Completes 93.0
+% Finished = 93.00
+Avg lap times: 473.5806451612903
 No Obs Time: 401.0
 -----------------------------------------------------
 Vehicle: RepeatSap_forest_8
-Crashes: 5.0 --> Completes 95.0
-% Finished = 95.00
-Avg lap times: 460.13684210526316
+Crashes: 2.0 --> Completes 98.0
+% Finished = 98.00
+Avg lap times: 467.8673469387755
 No Obs Time: 374.0
 -----------------------------------------------------
 Vehicle: RepeatSap_forest_9
-Crashes: 15.0 --> Completes 85.0
-% Finished = 85.00
-Avg lap times: 501.7647058823529
+Crashes: 7.0 --> Completes 93.0
+% Finished = 93.00
+Avg lap times: 505.8709677419355
 No Obs Time: 419.0
 -----------------------------------------------------

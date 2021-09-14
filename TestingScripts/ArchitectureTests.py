@@ -81,7 +81,7 @@ def comparison_test():
 def test_repeat(VehicleClass, base_name):
     sim_conf = load_conf("", "std_config")
     env = ForestSim(map_name, sim_conf)
-    test = TestVehicles(sim_conf, base_name + "_eval")
+    test = TestVehicles(sim_conf, base_name + "_eval1")
 
     for i in range(10):
         train_name = base_name + f"_{i}"
@@ -102,10 +102,11 @@ if __name__ == "__main__":
     # test_planner(EndVehicleTest, end_name)
 
     # test_repeat(NavTestVehicle, "RepeatNav_forest")
-    # test_repeat(ModVehicleTest, "RepeatMod_forest")
-    # test_repeat(SerialVehicleTest, "RepeatSap_forest")
+    test_repeat(EndVehicleTest, "RepeatEnd_forest")
+    test_repeat(ModVehicleTest, "RepeatMod_forest")
+    test_repeat(SerialVehicleTest, "RepeatSap_forest")
 
-    comparison_test()
+    # comparison_test()
 
 
 
