@@ -36,7 +36,7 @@ class DataBuilder:
                     self.data[i][key] = config_data[key]
 
 
-    def save_data_table(self, name="EvalVehicles/DataTable"):
+    def save_data_table(self, name="DataAnalysis/DataTable"):
         # keys = list(self.data.keys())
         with open(name + ".csv", 'w') as file:
             writer = csv.DictWriter(file, fieldnames=self.base_keys)

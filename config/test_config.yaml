@@ -40,5 +40,5 @@ train_n: 200
 # train_n: 100000
 buffer_n: 1000
 
-test_n: 10
+test_n: 100
 

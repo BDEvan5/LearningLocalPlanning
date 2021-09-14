@@ -1,0 +1,121 @@
+---
+output:
+  
+  
+  pdf_document: 
+    number_sections: yes
+title: Learning Formulation Optimisation for Obstacle Avoidance in Autonomous Racing
+author: Benjamin Evans
+# date: September 2021
+bibliography: references.bib
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+# 
+
+# Introduction
+
+This paper explores the effect of training parameters on an agent learning the task of unmapped obstacle avoidance in autonomous racing.
+For the study, we use the serial agent planner presented in \cite{} as our navigation stack.
+
+# Evaluation Methodology
+
+The planner is trained and tested in simulation using the official open-source F1/10th simulator \footnote{Available online: \url{www.GitHub.com/}}.
+
+\subsection{Metrics}
+
+The two main metrics are performance and success rate, since these are the measure of racing performance.
+The sample efficiency, repeatability and robustness of the policy are also measured.
+
+We measure the performance of the agent after training it in batches of 10,000's.
+When the performance difference between subsequent batches is negligible ($<1\%$) then we assume the network has converged.
+
+\subsubsection{Robustness to Sensor Noise}
+
+In the real world, all sensor measurements are noisy.
+Therefore, we evaluate the ability of our agents to perform in noisy environments.
+5, 10 and 20% noise values are added to the measurements and the results measured.
+
+\subsection{Learning Variables Studied}
+
+\subsubsection{Neural Network Architecture}
+
+The neural network architecture is studied along the two parameters of the number of neurons and depth of layers.
+A preliminary study on the kind of activation function is also conducted.
+
+\subsubsection{Reward Signal}
+
+The reward signal is used to encode the desired racing behaviour in an equation that tells the agent how good or bad it's performance is.
+The follow five reward signals are considered:
+
+```{=tex}
+\begin{enumerate}
+    \item Progress-based reward
+    \item Velocity-based reward
+    \item Action-based (minimum steering) reward
+    \item Distance to obstacle 
+    \item Distance to boundary
+\end{enumerate}
+```
+\subsubsection{Reward Hyper-parameters}
+
+The progress-based reward signal is then selected for further study.
+The reward consists of three different terms that are individually adjusted to determine their effect.
+An additional change is to consider the distance squared at each timestep.
+% (1+i)\^2
+
+\subsubsection{Algorithm}
+
+The algorithm used to train the agent is evaluated.
+The main comparison is between the two state of the art algorithms for continuous control, SAC and TD3.
+
+\subsubsection{Considerations}
+
+```{=tex}
+\begin{itemize}
+    \item Noise in training
+    \item Replay memory size
+    \item Learning rate?
+    \item Batch size? 
+    \item 
+\end{itemize}
+```
+\subsection{Physical Parameters Studied}
+
+\subsubsection{Number of Range Finders}
+
+We experiment with how the number of range finders affects the training performance.
+5, 10, 20 and 40 range finders are used.
+With 10 range finders, we vary the field of view from $\pi/2$ to $\pi$.
+We also consider the effect of the max range finder range, 3, 5 and 10 meters are used.
+
+Range finders in real life include a certain amount of noise.
+We consider adding different quantities of noise in the training process and then measure the resulting policies to robustness to noise in readings.
+
+\subsubsection{Stacking Windows}
+
+We evaluate the effect of stacking multiple windows on top of each other.
+1, 2, 5 and 10 windows are used in the analysis.
+
+\subsubsection{State Variable}
+
+The original state variable consists of 14 values.
+We remove each value and consider what effect it has on the training.
+
+# Results
+
+```{r}
+test_data = read.csv("DataTable.csv")
+attach(test_data)
+# plot(train_n, success_rate)
+plot(train_n, avg_times)
+
+
+```
+
+
+# Conclusions
+
+# Bibliography

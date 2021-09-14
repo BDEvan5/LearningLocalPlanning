@@ -14,3 +14,4 @@ ImitationData/
 *.pth
 
 EvalVehicles/
+.Rproj.user
