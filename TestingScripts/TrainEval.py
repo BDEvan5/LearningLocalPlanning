@@ -30,6 +30,7 @@ def run_step_tests(n):
     test_name = "TrainingSteps"
     # t_steps = [20000, 40000, 80000, 120000, 160000, 200000]
     t_steps = [200, 400, 800, 1200, 1600, 2000]
+    # t_steps = [2000]
     sim_conf.buffer_n = 10
     for t in t_steps:
         sim_conf.train_n = t
@@ -40,13 +41,15 @@ def run_step_tests(n):
 
         train_vehicle(env, training_vehicle, sim_conf)
 
+        test_vehicle = SerialVehicleTest(agent_name, sim_conf)
+        eval_dict = eval_vehicle(env, test_vehicle, sim_conf)
+
         config_dict = vars(sim_conf)
         config_dict['EvalName'] = test_name 
-        with open(f"EvalVehicles/{agent_name}/{agent_name}_config.yaml", 'w') as file:
-            yaml.dump(sim_conf, file)
+        config_dict.update(eval_dict)
 
-        test_vehicle = SerialVehicleTest(agent_name, sim_conf)
-        eval_vehicle(env, test_vehicle, sim_conf)
+        with open(f"EvalVehicles/{agent_name}/{agent_name}_record.yaml", 'w') as file:
+            yaml.dump(config_dict, file)
 
 
 
