@@ -25,13 +25,14 @@ def run_repeatability_tests(n):
         training_vehicle = SerialVehicleTrain(agent_name, sim_conf)
         # vehicle.calculate_reward = DistReward()
 
-        train_vehicle(env, training_vehicle, sim_conf)
+        train_time = train_vehicle(env, training_vehicle, sim_conf)
 
         test_vehicle = SerialVehicleTest(agent_name, sim_conf)
         eval_dict = eval_vehicle(env, test_vehicle, sim_conf)
 
         config_dict = vars(sim_conf)
         config_dict['EvalName'] = test_name 
+        config_dict['train_time'] = train_time
         config_dict['test_number'] = n
         config_dict.update(eval_dict)
 
@@ -42,10 +43,9 @@ def run_repeatability_tests(n):
 def run_step_tests(n):
     sim_conf = load_conf("", "test_config")
     test_name = "TrainingSteps"
-    t_steps = [5000, 10000, 20000, 40000, 60000, 80000]
+    t_steps = [2000, 4000, 6000, 8000, 10000, 15000, 20000, 40000, 60000]
     
     for t in t_steps:
-
         sim_conf.train_n = t
         env = ForestSim(sim_conf)
         agent_name = f"Sap_{test_name}_{t}_{n}"
@@ -70,11 +70,6 @@ def run_beams_tests(n):
     sim_conf = load_conf("", "test_config")
     test_name = "Beams"
     variable_list = [5, 10, 15, 20, 25, 30]
-    # variable_list = [15, 25]
-    sim_conf.buffer_n = 1000
-    sim_conf.train_n = 20000
-    sim_conf.test_n = 100
-    sim_conf.h_size = 100
     for variable in variable_list:
         sim_conf.n_beams = variable
         env = ForestSim(sim_conf)
@@ -99,7 +94,7 @@ def run_beams_tests(n):
 def run_hsize_tests(n):
     sim_conf = load_conf("", "test_config")
     test_name = "SizeH"
-    hsizes = [10, 20, 50, 100, 200] 
+    hsizes = [10, 20, 50, 80, 100, 150, 200] 
     sim_conf.buffer_n = 1000
     sim_conf.train_n = 20000
     sim_conf.test_n = 100
@@ -107,10 +102,10 @@ def run_hsize_tests(n):
         sim_conf.h_size = h
         env = ForestSim(sim_conf)
         agent_name = f"Sap_{test_name}_{h}_{n}"
-        # training_vehicle = SerialVehicleTrain(agent_name, sim_conf)
+        training_vehicle = SerialVehicleTrain(agent_name, sim_conf)
         # vehicle.calculate_reward = DistReward()
 
-        # train_time = train_vehicle(env, training_vehicle, sim_conf)
+        train_time = train_vehicle(env, training_vehicle, sim_conf)
 
         test_vehicle = SerialVehicleTest(agent_name, sim_conf)
         eval_dict = eval_vehicle(env, test_vehicle, sim_conf)
@@ -129,8 +124,8 @@ def run_hsize_tests(n):
 
 
 if __name__ == "__main__":
-    run_step_tests(2)
-    # run_hsize_tests(1)
-    # run_beams_tests(2)
-    # run_repeatability_tests(1)
+    run_beams_tests(3)
+    run_step_tests(3)
+    run_repeatability_tests(2)
+    run_hsize_tests(2)
 

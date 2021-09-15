@@ -36,13 +36,14 @@ class DataBuilder:
                     self.data[i][key] = config_data[key]
 
 
-    def save_data_table(self, name="DataAnalysis/DataTable"):
-        # keys = list(self.data.keys())
-        with open(name + ".csv", 'w') as file:
+    def save_data_table(self, name="DataTable"):
+        directory = "DataAnalysis/" + name + ".csv"
+        with open(directory, 'w') as file:
             writer = csv.DictWriter(file, fieldnames=self.base_keys)
             writer.writeheader()
             for i in range(len(self.data.keys())):
                 writer.writerow(self.data[i])
+
 
         print(f"Data saved to {name}")
 
