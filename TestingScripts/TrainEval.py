@@ -113,7 +113,7 @@ def run_hsize_tests(n):
         config_dict = vars(sim_conf)
         config_dict['EvalName'] = test_name 
         config_dict['test_number'] = n
-        # config_dict['train_time'] = train_time
+        config_dict['train_time'] = train_time
         config_dict.update(eval_dict)
 
         with open(f"EvalVehicles/{agent_name}/{agent_name}_record.yaml", 'w') as file:
@@ -125,7 +125,7 @@ def run_hsize_tests(n):
 
 if __name__ == "__main__":
     run_beams_tests(3)
-    run_step_tests(3)
-    run_repeatability_tests(2)
-    run_hsize_tests(2)
+    # run_step_tests(3)
+    # run_repeatability_tests(2)
+    # run_hsize_tests(2)
 

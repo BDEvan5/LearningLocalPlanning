@@ -67,7 +67,7 @@ Considering that we are generally using few range finder readings, we perturb th
 h_mask = which(test_data$EvalName=="SizeH")
 x_data = test_data$h_size[h_mask]
 y_data = test_data$avg_times[h_mask]
-plot(x_data, y_data, xlab="Hidden Layer Size", ylab="Average Lap Times", col="blue", type="o", pch=16, cex=2)
+plot(x_data, y_data, xlab="Hidden Layer Size", ylab="Average Lap Times", col="blue", pch=16, cex=2)
 ```
 Figure \@ref(fig:h_size_fig) shows how for different hidden layer sizes after 100 neurons, there is a negligible change in the performance of the vehicle.
 For smaller network sizes, the average lap times become a lot worse.

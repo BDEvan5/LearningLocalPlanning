@@ -26,9 +26,9 @@ lookahead: 0.8
 max_reacquire: 20
 
 # training parameters
-n_beams: 10
+n_beams: 15
 range_finder_scale: 5
-h_size: 200
+h_size: 100
 activation: 'relu'
 layers: 2
 
@@ -36,7 +36,7 @@ layers: 2
 reward: 'progress'
 s_mul: 1
 
-train_n: 200
+train_n: 20000
 # train_n: 100000
 buffer_n: 1000
 
