@@ -141,6 +141,70 @@ def eval_vehicle(env, vehicle, sim_conf, show=False):
 
     return eval_dict
 
+def eval_vehicle_times(env, vehicle, sim_conf, show=False):
+    crashes = 0
+    completes = 0
+    lap_times = [] 
+
+    state = env.reset(False)
+    done, score = False, 0.0
+
+    while not done:
+        a = vehicle.plan_act(state)
+        s_p, r, done, _ = env.step_plan(a)
+        state = s_p
+    if show:
+        env.render(wait=False, name=vehicle.name)
+    no_obs_time = np.copy(env.steps) 
+    print(f"Complete no obs -> time: {env.steps}")
+
+    state = env.reset(True)
+    done, score = False, 0.0
+    for i in range(sim_conf.test_n):
+        try:
+            vehicle.plan_forest(env.env_map)
+        except AttributeError as e:
+            pass
+        while not done:
+            a = vehicle.plan_act(state)
+            s_p, r, done, _ = env.step_plan(a)
+            state = s_p
+        if show:
+            env.render(wait=False, name=vehicle.name)
+
+        if r == -1:
+            crashes += 1
+            print(f"({i}) Crashed -> time: {env.steps} ")
+        else:
+            completes += 1
+            print(f"({i}) Complete -> time: {env.steps}")
+            lap_times.append(env.steps)
+        state = env.reset(True)
+        
+        vehicle.reset_lap()
+        done = False
+
+    success_rate = (completes / (completes + crashes) * 100)
+    if len(lap_times) > 0:
+        avg_times, std_dev = np.mean(lap_times), np.std(lap_times)
+    else:
+        avg_times, std_dev = 0, 0
+
+    print(f"Crashes: {crashes}")
+    print(f"Completes: {completes} --> {success_rate:.2f} %")
+    print(f"Lap times Avg: {avg_times} --> Std: {std_dev}")
+
+    eval_dict = {}
+    eval_dict['name'] = vehicle.name
+    eval_dict['success_rate'] = float(success_rate)
+    eval_dict['avg_times'] = float(avg_times)
+    eval_dict['std_dev'] = float(std_dev)
+    eval_dict['no_obs_time'] = float(no_obs_time)
+
+    print(f"Finished running test and saving file with results.")
+
+    return eval_dict, lap_times
+
 
 """Testing Function"""
 class TestData:

@@ -14,6 +14,8 @@ plot(x_data, y_data, xlab="Hidden Layer Size", ylab="Average Lap Times", col="bl
 beam_mask = which(test_data$EvalName=="Beams")
 plot(test_data$n_beams[beam_mask], test_data$success_rate[beam_mask], xlab="Number of Beams", ylab="Success Rate", col="red", pch=16, cex=2)
 plot(test_data$n_beams[beam_mask], test_data$avg_times[beam_mask], xlab="Number of Beams", ylab="Average Times", col="red", pch=16, cex=2)
+plot(test_data$n_beams[beam_mask], test_data$success_rate[beam_mask], xlab="Number of Beams", ylab="Success Rate", col="red", pch=16, cex=2, ylim=c(90, 100))
+plot(test_data$n_beams[beam_mask], test_data$avg_times[beam_mask], xlab="Number of Beams", ylab="Average Times", col="red", pch=16, cex=2, ylim=c(350, 500))
 
 # training steps
 step_mask = which(test_data$EvalName=="TrainingSteps")

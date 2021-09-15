@@ -1,6 +1,8 @@
 import numpy as np
 
 class DistReward:
+    def __init__(self):
+        self.name = f"Progress"
     # @staticmethod
     def __call__(self, state, s_prime):        
         reward = s_prime['target'][1] - state['target'][1]
@@ -9,6 +11,8 @@ class DistReward:
         return reward
 
 class DistRewardSquare:
+    def __init__(self):
+        self.name = f"DistSquare"
     # @staticmethod
     def __call__(self, state, s_prime):        
         distance = s_prime['target'][1] - state['target'][1]
@@ -17,10 +21,22 @@ class DistRewardSquare:
 
         return reward
 
+class DistRewardSqrt:
+    def __init__(self):
+        self.name = f"DistSqrt"
+    # @staticmethod
+    def __call__(self, state, s_prime):        
+        distance = s_prime['target'][1] - state['target'][1]
+        reward = (max(distance, 0))**0.5
+        reward += s_prime['reward']
+
+        return reward
+
 class CthReward:
     def __init__(self, b_ct, b_h):
         self.b_ct = b_ct 
         self.b_h = b_h
+        self.name = f"Velocity({b_ct})({b_h})"
 
     def __call__(self, state, s_prime):        
         # on assumuption of forest with middle @1 and heading =straight 
@@ -33,9 +49,11 @@ class CthReward:
 
         return reward
 
+
 class SteeringReward:
     def __init__(self, b_s):
         self.b_s = b_s
+        self.name = f"Steering({b_s})"
         
     def __call__(self, state, s_prime):
         reward = - abs(s_prime['state'][4])**0.5 * self.b_s
