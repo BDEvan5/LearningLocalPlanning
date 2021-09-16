@@ -45,7 +45,7 @@ class DataBuilder:
                 writer.writerow(self.data[i])
 
 
-        print(f"Data saved to {name}")
+        print(f"Data saved to {name} --> {len(self.data)} Entries")
 
 if __name__ == "__main__":
     db = DataBuilder()

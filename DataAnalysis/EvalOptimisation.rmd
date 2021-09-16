@@ -17,6 +17,13 @@ editor_options:
 test_data = read.csv("DataTable.csv")
 # knitr::opts_chunk$set(include = FALSE)
 knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
+library(reshape2)
+# library(gridExtra)
+library(ggplot2)
+library(dplyr)
+
 ```
 
 
@@ -46,11 +53,40 @@ The sample efficiency, repeatability and robustness of the policy are also measu
 The repeatability of the training and testing is studied to measure the statistical significance of the results.
 An agent is trained 10 times with the same parameters and the distribution of the results is studied.
 
-```{r}
-
-
+```{r, fig.height=2}
+test_data %>%
+  filter(EvalName=="Repeat") %>%
+  select(avg_times, success_rate, test_number) %>%
+  ggplot(aes(x=avg_times, y=success_rate, col=test_number, size=10))+
+  geom_point()+
+  xlim(350, 750)+
+  ylim(70, 100)+
+  xlab("Average times")+
+  ylab("Success Rate")
 ```
 
+The figure above shows the distribution of the average times and success rates from agents that are trained using the same parameters.
+Note that the different colors represent different tests with slightly different parameters.
+
+The distribution of the resulting lap times is measured by testing the 10 agents trained for the repeatability and running 1000 test episodes of each of them.
+The combined distribution is shown below.
+
+```{r}
+total_set = melt(data.frame(t(read.csv("RepeatingTimes_4.csv", header=F))))
+
+layout(mat=matrix(c(1, 2), 2, 1, byrow=T))
+
+par(mar=c(0, 1, 1, 1))
+hist(total_set$value, xlim=c(360, 650), breaks=50)
+par(mar=c(0, 1, 0, 1))
+boxplot(total_set$value, ylim=c(370,700), horizontal = T, axes=F)
+```
+The figure shows that a significant majority of the results are around the lower lap times (below 400ms).
+The x axis represents the time to complete an episode in ms.
+The data is skewed to the lower lap times with the majority of times being within 380 to 390ms.
+
+<!-- Find a way to work out how many tests I need to get an accurate representation? -->
+<!-- Some measure of the variance or std dev or somthing like that? -->
 
 # Learning Parametes
 
@@ -63,7 +99,7 @@ A similar approach, using 60 range finders and several state variables, used net
 <!-- @fuchs2021super. -->
 Considering that we are generally using few range finder readings, we perturb this value downwards to see if it has any effect on the outcome.
 
-```{r, h_size_fig, fig.cap="Study on Size of Hidden Layers"}
+```{r, h_size_fig, fig.cap="Study on Size of Hidden Layers", fig.height=3.5}
 h_mask = which(test_data$EvalName=="SizeH")
 x_data = test_data$h_size[h_mask]
 y_data = test_data$avg_times[h_mask]
@@ -79,7 +115,7 @@ LiDAR sensors provides dense spatial data of the surrounding environment and can
 Only several beams are sampled from the full scan to keep training times fast and the network small.
 Originally 10 beams were used to build on work by Tai et al. 
 
-```{r}
+```{r, fig.height=3.5}
 beam_mask = which(test_data$EvalName=="Beams")
 plot(test_data$n_beams[beam_mask], test_data$success_rate[beam_mask], xlab="Number of Beams", ylab="Success Rate", col="red", pch=16, cex=2)
 ```
@@ -95,7 +131,7 @@ Further study on the LiDAR scan could look at the distance used for scaling and 
 While reinforcement has the advantage of being able to learn from the agent's own experience, it is often sample inefficient.
 The number of steps required to train the agent to convergence is measured.
 
-```{r}
+```{r, fig.height=3.5}
 step_mask = which(test_data$EvalName=="TrainingSteps")
 x_data = test_data$train_n[step_mask]
 y_data = test_data$avg_times[step_mask]
@@ -105,7 +141,7 @@ The graph shows that the performance levels out after 20,000 training steps.
 Therefore, the training time is decreased.
 The next figure provides a more zoomed in look at the success rate for shorter training steps.
 
-```{r}
+```{r, fig.height=3.5}
 step_mask = which(test_data$EvalName=="TrainingSteps")
 x_data = test_data$train_n[step_mask]
 y_data = test_data$success_rate[step_mask]
@@ -119,15 +155,30 @@ plot(x_data, y_data, xlab="Training Steps", ylab="Success Rate", xlim=c(0,50000)
 Five different reward signals are selected and used to train agents.
 The table below shows the average results from training 5 agents with each reward signal.
 
-```{r}
-# reward_mask = which(test_data$EvalName=="Reward")
-# progress_times = test_data$avg_times[which(test_data$reward=='progress')]
-# data = c(test_data$reward, test_data$avg_times)
-# knitr::kable(data, caption="Reward Function")
-
-# frame = data.frame(test_data)
-# print(fram)
+```{r, fig.height=3}
+test_data %>%
+  filter(EvalName=="RewardSignal")%>%
+  select(avg_times, success_rate, test_number, reward) %>%
+  ggplot(aes(x=reward, y=(avg_times)))+
+  geom_boxplot()+
+  ylim(380, 720)
 ```
+The figure above shows how the progress and DistSquare reward signals produce the fastest lap times by over 100ms. 
+Therefore, they are selected for further comparison below.
+
+```{r, fig.height=3.5}
+test_data %>%
+  filter(EvalName=="RewardSignal")%>%
+  select(avg_times, success_rate, test_number, reward) %>%
+  ggplot(aes(x=reward, y=success_rate))+
+  geom_boxplot()+
+  geom_point()+
+  ylim(75, 100)
+  
+```
+
+The figure above shows how the success rate of the progress reward is consistently much higher than the other reward signals. 
+This is possibly due to hyper-parameter balancing.
 
 ## Progress Hyper-Parameters
 
@@ -154,7 +205,7 @@ The table below presents the final values that were selected to produce the best
 |Hidden layer size | 100 |
 |Training steps | 20000 |
 |LiDAR beams  | 15 |
-|Reward Signal | |
+|Reward Signal |Progress |
 
 
 

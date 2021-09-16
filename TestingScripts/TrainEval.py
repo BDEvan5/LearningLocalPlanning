@@ -164,18 +164,19 @@ def compare_rewards(n):
     for r_signal in rewards:
         env = ForestSim(sim_conf)
         agent_name = f"Sap_{test_name}_{r_signal.name}_{n}"
-        training_vehicle = SerialVehicleTrain(agent_name, sim_conf)
-        training_vehicle.calculate_reward = r_signal
+        # training_vehicle = SerialVehicleTrain(agent_name, sim_conf)
+        # training_vehicle.calculate_reward = r_signal
 
-        train_time = train_vehicle(env, training_vehicle, sim_conf)
+        # train_time = train_vehicle(env, training_vehicle, sim_conf)
 
         test_vehicle = SerialVehicleTest(agent_name, sim_conf)
         eval_dict = eval_vehicle(env, test_vehicle, sim_conf)
 
         config_dict = vars(sim_conf)
         config_dict['EvalName'] = test_name 
-        config_dict['train_time'] = train_time
+        # config_dict['train_time'] = train_time
         config_dict['test_number'] = n
+        config_dict['reward'] = r_signal.name
         config_dict.update(eval_dict)
 
         with open(f"EvalVehicles/{agent_name}/{agent_name}_record.yaml", 'w') as file:
